@@ -10,3 +10,4 @@ jobs:
           echo "Hello World!"
           ls /opt
           ls /opt/spack*
+          echo "All done"
