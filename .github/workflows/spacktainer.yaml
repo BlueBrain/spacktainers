@@ -16,3 +16,6 @@ jobs:
           /opt/spack/bin/spack config blame mirrors
           /opt/spack/bin/spack mirror add --s3-access-key-id=${AWS_CACHE_ACCESS_KEY_ID} --s3-access-key-secret=${AWS_CACHE_SECRET_ACCESS_KEY} s3cache s3://${AWS_CACHE_BUCKET}
           /opt/spack/bin/spack config blame mirrors
+      - name: second step
+        run: |-
+          /opt/spack/bin/spack config blame mirrors
