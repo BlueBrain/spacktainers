@@ -28,7 +28,7 @@ SHELL ["/bin/bash", "--login", "-c"]
 
 RUN echo "Cloning spack branch $SPACK_BRANCH"
 RUN mkdir $SPACK_ROOT && cd $SPACK_ROOT \
- && git clone --single-branch --branch $SPACK_BRANCH https://github.com/BlueBrain/spack.git . \
+ && git clone --single-branch --branch $SPACK_BRANCH https://github.com/spack/spack.git . \
  && mkdir -p $SPACK_ROOT/opt/spack
 
 RUN ln -s $SPACK_ROOT/share/spack/docker/entrypoint.bash \
