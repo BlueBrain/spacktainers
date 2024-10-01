@@ -27,6 +27,7 @@ jobs:
           # ' --label org.opencontainers.image.created="$CI_JOB_STARTED_AT"'
         run: |-
           echo "Creating builder"
+          yum install -y awscli
           export STORAGE_DRIVER=vfs  # allows to build inside containers without additional mounts
           export BUILDAH_FORMAT=docker  # enables ONBUILD instructions which are not OCI compatible
           export REGISTRY_IMAGE_TAG=latest  # for now
@@ -57,6 +58,7 @@ jobs:
         run: |-
           # Holy code duplication, Batman!
           echo "Creating runtime"
+          yum install -y awscli
           export STORAGE_DRIVER=vfs  # allows to build inside containers without additional mounts
           export BUILDAH_FORMAT=docker  # enables ONBUILD instructions which are not OCI compatible
           export REGISTRY_IMAGE_TAG=latest  # for now
