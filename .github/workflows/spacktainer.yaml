@@ -2,78 +2,80 @@
 name: Build Spacktainers
 on: [push]
 jobs:
-  base-container-job:
-    runs-on:
-      - codebuild-spacktainers-${{ github.run_id }}-${{ github.run_attempt }}
-      - image:ubuntu-6.0
-      - instance-size:large
-    steps:
-      - name: clone repo
-        uses: actions/checkout@v4
-      - name: create builder
-        env:
-          AWS_REPO_URL: ${{ secrets.AWS_REPO_URL }}
-          AWS_BUILDER_REPO_URL: ${{ secrets.AWS_REPO_URL }}/spacktainers/builder
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ECR_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_ECR_SECRET_ACCESS_KEY }}
-          BUILDAH_EXTRA_ARGS: (
-            '--label org.opencontainers.image.revision="$GITHUB_SHA"'
-            ' --label org.opencontainers.image.authors="$GITHUB_TRIGGERING_ACTOR"'
-            ' --label org.opencontainers.image.url="https://github.com/${GITHUB_REPOSITORY}"'
-            ' --label org.opencontainers.image.source="https://github.com/${GITHUB_REPOSITORY}"'
-            ' --label ch.epfl.bbpgitlab.ci-pipeline-url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"'
-            ' --label ch.epfl.bbpgitlab.ci-commit-branch="$GITHUB_REF_NAME"'
-            '--build-arg SPACK_BRANCH=59179764d711a9a4e9e36b5b08a8587e2455a651')
-          # ' --label org.opencontainers.image.created="$CI_JOB_STARTED_AT"'
-        run: |-
-          echo "Creating builder"
-          yum install -y awscli
-          export STORAGE_DRIVER=vfs  # allows to build inside containers without additional mounts
-          export BUILDAH_FORMAT=docker  # enables ONBUILD instructions which are not OCI compatible
-          export REGISTRY_IMAGE_TAG=latest  # for now
-          aws ecr get-login-password --region us-east-1 | buildah login --username AWS --password-stdin ${AWS_REPO_URL}
-          # This is written like that in case $BUILDAH_EXTRA_ARGS has args that require spaces,
-          # which is tricky with shell variable expansion.  Similar to Kaniko, see also:
-          # https://github.com/GoogleContainerTools/kaniko/issues/1803
-          export IFS=''
-          COMMAND="buildah bud --iidfile image_id ${BUILDAH_EXTRA_ARGS} builder"
-          eval "${COMMAND}"
-          # Sometimes buildah push fails on the first attempt
-          buildah push $(<image_id) "docker://${AWS_BUILDER_REPO_URL}:${REGISTRY_IMAGE_TAG}" || sleep 10; buildah push $(<image_id) "docker://${AWS_BUILDER_REPO_URL}:${REGISTRY_IMAGE_TAG}"
-      - name: create runtime
-        env:
-          AWS_REPO_URL: ${{ secrets.AWS_REPO_URL }}
-          AWS_BUILDER_REPO_URL: ${{ secrets.AWS_REPO_URL }}/spacktainers/runtime
-          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ECR_ACCESS_KEY_ID }}
-          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_ECR_SECRET_ACCESS_KEY }}
-          BUILDAH_EXTRA_ARGS: (
-            '--label org.opencontainers.image.revision="$GITHUB_SHA"'
-            ' --label org.opencontainers.image.authors="$GITHUB_TRIGGERING_ACTOR"'
-            ' --label org.opencontainers.image.url="https://github.com/${GITHUB_REPOSITORY}"'
-            ' --label org.opencontainers.image.source="https://github.com/${GITHUB_REPOSITORY}"'
-            ' --label ch.epfl.bbpgitlab.ci-pipeline-url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"'
-            ' --label ch.epfl.bbpgitlab.ci-commit-branch="$GITHUB_REF_NAME"'
-            '--build-arg SPACK_BRANCH=59179764d711a9a4e9e36b5b08a8587e2455a651')
-          # ' --label org.opencontainers.image.created="$CI_JOB_STARTED_AT"'
-        run: |-
-          # Holy code duplication, Batman!
-          echo "Creating runtime"
-          yum install -y awscli
-          export STORAGE_DRIVER=vfs  # allows to build inside containers without additional mounts
-          export BUILDAH_FORMAT=docker  # enables ONBUILD instructions which are not OCI compatible
-          export REGISTRY_IMAGE_TAG=latest  # for now
-          aws ecr get-login-password --region us-east-1 | buildah login --username AWS --password-stdin ${AWS_REPO_URL}
-          # This is written like that in case $BUILDAH_EXTRA_ARGS has args that require spaces,
-          # which is tricky with shell variable expansion.  Similar to Kaniko, see also:
-          # https://github.com/GoogleContainerTools/kaniko/issues/1803
-          export IFS=''
-          COMMAND="buildah bud --iidfile image_id ${BUILDAH_EXTRA_ARGS} builder"
-          eval "${COMMAND}"
-          # Sometimes buildah push fails on the first attempt
-          buildah push $(<image_id) "docker://${AWS_BUILDER_REPO_URL}:${REGISTRY_IMAGE_TAG}" || sleep 10; buildah push $(<image_id) "docker://${AWS_BUILDER_REPO_URL}:${REGISTRY_IMAGE_TAG}"
+  #base-container-job:
+  #  runs-on:
+  #    - codebuild-spacktainers-${{ github.run_id }}-${{ github.run_attempt }}
+  #    - image:ubuntu-6.0
+  #    - instance-size:large
+  #  steps:
+  #    - name: clone repo
+  #      uses: actions/checkout@v4
+  #    - name: create builder
+  #      env:
+  #        AWS_REPO_URL: ${{ secrets.AWS_REPO_URL }}
+  #        AWS_BUILDER_REPO_URL: ${{ secrets.AWS_REPO_URL }}/spacktainers/builder
+  #        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ECR_ACCESS_KEY_ID }}
+  #        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_ECR_SECRET_ACCESS_KEY }}
+  #        BUILDAH_EXTRA_ARGS: (
+  #          '--label org.opencontainers.image.revision="$GITHUB_SHA"'
+  #          ' --label org.opencontainers.image.authors="$GITHUB_TRIGGERING_ACTOR"'
+  #          ' --label org.opencontainers.image.url="https://github.com/${GITHUB_REPOSITORY}"'
+  #          ' --label org.opencontainers.image.source="https://github.com/${GITHUB_REPOSITORY}"'
+  #          ' --label ch.epfl.bbpgitlab.ci-pipeline-url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"'
+  #          ' --label ch.epfl.bbpgitlab.ci-commit-branch="$GITHUB_REF_NAME"'
+  #          '--build-arg SPACK_BRANCH=59179764d711a9a4e9e36b5b08a8587e2455a651')
+  #        # ' --label org.opencontainers.image.created="$CI_JOB_STARTED_AT"'
+  #      run: |-
+  #        echo "Creating builder"
+  #        yum install -y awscli
+  #        export STORAGE_DRIVER=vfs  # allows to build inside containers without additional mounts
+  #        export BUILDAH_FORMAT=docker  # enables ONBUILD instructions which are not OCI compatible
+  #        export REGISTRY_IMAGE_TAG=latest  # for now
+  #        aws ecr get-login-password --region us-east-1 | buildah login --username AWS --password-stdin ${AWS_REPO_URL}
+  #        # This is written like that in case $BUILDAH_EXTRA_ARGS has args that require spaces,
+  #        # which is tricky with shell variable expansion.  Similar to Kaniko, see also:
+  #        # https://github.com/GoogleContainerTools/kaniko/issues/1803
+  #        export IFS=''
+  #        COMMAND="buildah bud --iidfile image_id ${BUILDAH_EXTRA_ARGS} builder"
+  #        eval "${COMMAND}"
+  #        # Sometimes buildah push fails on the first attempt
+  #        buildah push $(<image_id) "docker://${AWS_BUILDER_REPO_URL}:${REGISTRY_IMAGE_TAG}" || sleep 10; buildah push $(<image_id) "docker://${AWS_BUILDER_REPO_URL}:${REGISTRY_IMAGE_TAG}"
+  #    - name: create runtime
+  #      env:
+  #        AWS_REPO_URL: ${{ secrets.AWS_REPO_URL }}
+  #        AWS_BUILDER_REPO_URL: ${{ secrets.AWS_REPO_URL }}/spacktainers/runtime
+  #        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ECR_ACCESS_KEY_ID }}
+  #        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_ECR_SECRET_ACCESS_KEY }}
+  #        BUILDAH_EXTRA_ARGS: (
+  #          '--label org.opencontainers.image.revision="$GITHUB_SHA"'
+  #          ' --label org.opencontainers.image.authors="$GITHUB_TRIGGERING_ACTOR"'
+  #          ' --label org.opencontainers.image.url="https://github.com/${GITHUB_REPOSITORY}"'
+  #          ' --label org.opencontainers.image.source="https://github.com/${GITHUB_REPOSITORY}"'
+  #          ' --label ch.epfl.bbpgitlab.ci-pipeline-url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"'
+  #          ' --label ch.epfl.bbpgitlab.ci-commit-branch="$GITHUB_REF_NAME"'
+  #          '--build-arg SPACK_BRANCH=59179764d711a9a4e9e36b5b08a8587e2455a651')
+  #        # ' --label org.opencontainers.image.created="$CI_JOB_STARTED_AT"'
+  #      run: |-
+  #        # Holy code duplication, Batman!
+  #        echo "Creating runtime"
+  #        yum install -y awscli
+  #        export STORAGE_DRIVER=vfs  # allows to build inside containers without additional mounts
+  #        export BUILDAH_FORMAT=docker  # enables ONBUILD instructions which are not OCI compatible
+  #        export REGISTRY_IMAGE_TAG=latest  # for now
+  #        aws ecr get-login-password --region us-east-1 | buildah login --username AWS --password-stdin ${AWS_REPO_URL}
+  #        # This is written like that in case $BUILDAH_EXTRA_ARGS has args that require spaces,
+  #        # which is tricky with shell variable expansion.  Similar to Kaniko, see also:
+  #        # https://github.com/GoogleContainerTools/kaniko/issues/1803
+  #        export IFS=''
+  #        COMMAND="buildah bud --iidfile image_id ${BUILDAH_EXTRA_ARGS} builder"
+  #        eval "${COMMAND}"
+  #        # Sometimes buildah push fails on the first attempt
+  #        buildah push $(<image_id) "docker://${AWS_BUILDER_REPO_URL}:${REGISTRY_IMAGE_TAG}" || sleep 10; buildah push $(<image_id) "docker://${AWS_BUILDER_REPO_URL}:${REGISTRY_IMAGE_TAG}"
   spacktainer-build-job:
     runs-on:
       - codebuild-spacktainers-${{ github.run_id }}-${{ github.run_attempt }}
+      - image:linux-4.0
+      - instance-size:small
     steps:
       - name: configure-build-cache
         env:
