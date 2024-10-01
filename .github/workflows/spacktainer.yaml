@@ -74,7 +74,7 @@ jobs:
   spacktainer-build-job:
     runs-on:
       - codebuild-spacktainers-${{ github.run_id }}-${{ github.run_attempt }}
-      - image:linux-4.0
+      - image:ubuntu-6.0
       - instance-size:small
     steps:
       - name: configure-build-cache
