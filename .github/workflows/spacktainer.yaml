@@ -5,7 +5,7 @@ jobs:
   base-container-job:
     runs-on:
       - codebuild-spacktainers-${{ github.run_id }}-${{ github.run_attempt }}
-      - image:quay.io/buildah/stable
+      - image:quay.io/buildah/stable:latest
       - instance-size:small
     steps:
       - name: clone repo
