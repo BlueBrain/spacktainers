@@ -5,8 +5,7 @@ jobs:
   base-container-job:
     runs-on:
       - codebuild-spacktainers-${{ github.run_id }}-${{ github.run_attempt }}
-      - image:quay.io/buildah/stable:latest
-      - instance-size:small
+      - image:LINUX_CONTAINER-quay.io/buildah/stable:latest
     steps:
       - name: clone repo
         uses: actions/checkout@v4
