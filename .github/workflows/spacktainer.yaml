@@ -5,6 +5,8 @@ jobs:
   base-container-job:
     runs-on:
       - codebuild-spacktainers-${{ github.run_id }}-${{ github.run_attempt }}
+      - image:ubuntu-7.0
+      - instance-size:small
     steps:
       - name: clone repo
         uses: actions/checkout@v4
@@ -24,7 +26,7 @@ jobs:
           # ' --label org.opencontainers.image.created="$CI_JOB_STARTED_AT"'
         run: |-
           echo "Creating builder"
-          yum install -y awscli
+          apt install -y awscli buildah podman
           export STORAGE_DRIVER=vfs  # allows to build inside containers without additional mounts
           export BUILDAH_FORMAT=docker  # enables ONBUILD instructions which are not OCI compatible
           export REGISTRY_IMAGE_TAG=latest  # for now
@@ -72,6 +74,7 @@ jobs:
       - codebuild-spacktainers-${{ github.run_id }}-${{ github.run_attempt }}
       - image:LINUX_IMAGE-130659266700.dkr.ecr.us-east-1.amazonaws.com/spacktainers/builder:latest
       - instance-size:small
+    needs: base-container-job
     steps:
       - name: configure-build-cache
         env:
