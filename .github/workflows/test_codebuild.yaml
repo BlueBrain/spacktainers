@@ -45,7 +45,7 @@ jobs:
   runs-on-ecr-container:
     runs-on:
       - codebuild-spacktainers-${{ github.run_id }}-${{ github.run_attempt }}
-      - image:LINUX_IMAGE-130659266700.dkr.ecr.us-east-1.amazonaws.com/spacktainers/builder:latest
+      - image:130659266700.dkr.ecr.us-east-1.amazonaws.com/spacktainers/builder:latest
       - instance-size:small
     steps:
       - name: clone repo
