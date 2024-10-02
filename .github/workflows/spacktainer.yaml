@@ -22,7 +22,7 @@ jobs:
             --label org.opencontainers.image.source="https://github.com/${GITHUB_REPOSITORY}"
             --label ch.epfl.bbpgitlab.ci-pipeline-url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
             --label ch.epfl.bbpgitlab.ci-commit-branch="$GITHUB_REF_NAME"
-            --build-arg SPACK_BRANCH=59179764d711a9a4e9e36b5b08a8587e2455a651
+            --build-arg SPACK_BRANCH=develop
           # ' --label org.opencontainers.image.created="$CI_JOB_STARTED_AT"'
         run: |-
           echo "Creating builder"
@@ -53,7 +53,7 @@ jobs:
             --label org.opencontainers.image.source="https://github.com/${GITHUB_REPOSITORY}"
             --label ch.epfl.bbpgitlab.ci-pipeline-url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
             --label ch.epfl.bbpgitlab.ci-commit-branch="$GITHUB_REF_NAME"
-            --build-arg SPACK_BRANCH=59179764d711a9a4e9e36b5b08a8587e2455a651
+            --build-arg SPACK_BRANCH=develop
           # ' --label org.opencontainers.image.created="$CI_JOB_STARTED_AT"'
         run: |-
           # Holy code duplication, Batman!
