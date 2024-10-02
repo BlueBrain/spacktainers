@@ -26,6 +26,7 @@ jobs:
           # ' --label org.opencontainers.image.created="$CI_JOB_STARTED_AT"'
         run: |-
           echo "Creating builder"
+          set -x
           apt install -y awscli buildah podman
           export STORAGE_DRIVER=vfs  # allows to build inside containers without additional mounts
           export BUILDAH_FORMAT=docker  # enables ONBUILD instructions which are not OCI compatible
@@ -36,6 +37,7 @@ jobs:
           # https://github.com/GoogleContainerTools/kaniko/issues/1803
           export IFS=''
           COMMAND="buildah bud --iidfile image_id ${BUILDAH_EXTRA_ARGS} builder"
+          echo "${COMMAND}"
           eval "${COMMAND}"
           # Sometimes buildah push fails on the first attempt
           buildah push $(<image_id) "docker://${AWS_BUILDER_REPO_URL}:${REGISTRY_IMAGE_TAG}" || sleep 10; buildah push $(<image_id) "docker://${AWS_BUILDER_REPO_URL}:${REGISTRY_IMAGE_TAG}"
