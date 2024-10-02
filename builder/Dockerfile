@@ -40,8 +40,8 @@ RUN ln -s $SPACK_ROOT/share/spack/docker/entrypoint.bash \
 
 RUN cp $SPACK_ROOT/share/spack/docker/modules.yaml \
         $SPACK_ROOT/etc/spack/modules.yaml \
- && cp $SPACK_ROOT/bluebrain/sysconfig/containers/packages.yaml \
-        $SPACK_ROOT/etc/spack/packages.yaml \
+ # && cp $SPACK_ROOT/bluebrain/sysconfig/containers/packages.yaml \
+        # $SPACK_ROOT/etc/spack/packages.yaml \
  && rm -rf /root/*.* /run/nologin $SPACK_ROOT/.git
 
 # [WORKAROUND]
