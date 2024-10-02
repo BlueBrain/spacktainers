@@ -1,0 +1,58 @@
+---
+name: CodeBuild experiments
+on: [push]
+jobs:
+  run-on-default-container:
+    runs-on:
+      - codebuild-spacktainers-${{ github.run_id }}-${{ github.run_attempt }}
+    steps:
+      - name: clone repo
+        uses: actions/checkout@v4
+      - name: info
+        run: |-
+          echo "Info step"
+          ls
+          uname -a
+          ls /opt
+  run-on-aws-container:
+    runs-on:
+      - codebuild-spacktainers-${{ github.run_id }}-${{ github.run_attempt }}
+      - image:ubuntu-7.0
+      - instance-size:small
+    steps:
+      - name: clone repo
+        uses: actions/checkout@v4
+      - name: info
+        run: |-
+          echo "Info step"
+          ls
+          uname -a
+          ls /opt
+  runs-on-quay-container:
+    runs-on:
+      - codebuild-spacktainers-${{ github.run_id }}-${{ github.run_attempt }}
+      - image:quay.io/buildah/stable:latest
+      - instance-size:small
+    steps:
+      - name: clone repo
+        uses: actions/checkout@v4
+      - name: info
+        run: |-
+          echo "Info step"
+          ls
+          uname -a
+          ls /opt
+  runs-on-ecr-container:
+    runs-on:
+      - codebuild-spacktainers-${{ github.run_id }}-${{ github.run_attempt }}
+      - image:LINUX_IMAGE-130659266700.dkr.ecr.us-east-1.amazonaws.com/spacktainers/builder:latest
+      - instance-size:small
+    steps:
+      - name: clone repo
+        uses: actions/checkout@v4
+      - name: info
+        run: |-
+          echo "Info step"
+          ls
+          uname -a
+          ls /opt
