@@ -12,8 +12,8 @@ jobs:
         uses: actions/checkout@v4
       - name: create builder
         env:
-          AWS_REPO_URL: ${{ secrets.AWS_REPO_URL }}
-          AWS_BUILDER_REPO_URL: ${{ secrets.AWS_REPO_URL }}/spacktainers/builder
+          AWS_ECR_URL: ${{ secrets.AWS_ECR_URL }}
+          AWS_BUILDER_REPO_URL: ${{ secrets.AWS_ECR_URL }}/spacktainers/builder
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ECR_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_ECR_SECRET_ACCESS_KEY }}
           BUILDAH_EXTRA_ARGS: ( '--label org.opencontainers.image.revision="$GITHUB_SHA"'
@@ -30,7 +30,7 @@ jobs:
           export STORAGE_DRIVER=vfs  # allows to build inside containers without additional mounts
           export BUILDAH_FORMAT=docker  # enables ONBUILD instructions which are not OCI compatible
           export REGISTRY_IMAGE_TAG=latest  # for now
-          aws ecr get-login-password --region us-east-1 | buildah login --username AWS --password-stdin ${AWS_REPO_URL}
+          aws ecr get-login-password --region us-east-1 | buildah login --username AWS --password-stdin ${AWS_ECR_URL}
           # This is written like that in case $BUILDAH_EXTRA_ARGS has args that require spaces,
           # which is tricky with shell variable expansion.  Similar to Kaniko, see also:
           # https://github.com/GoogleContainerTools/kaniko/issues/1803
@@ -41,8 +41,8 @@ jobs:
           buildah push $(<image_id) "docker://${AWS_BUILDER_REPO_URL}:${REGISTRY_IMAGE_TAG}" || sleep 10; buildah push $(<image_id) "docker://${AWS_BUILDER_REPO_URL}:${REGISTRY_IMAGE_TAG}"
       - name: create runtime
         env:
-          AWS_REPO_URL: ${{ secrets.AWS_REPO_URL }}
-          AWS_BUILDER_REPO_URL: ${{ secrets.AWS_REPO_URL }}/spacktainers/runtime
+          AWS_ECR_URL: ${{ secrets.AWS_ECR_URL }}
+          AWS_BUILDER_REPO_URL: ${{ secrets.AWS_ECR_URL }}/spacktainers/runtime
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ECR_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_ECR_SECRET_ACCESS_KEY }}
           BUILDAH_EXTRA_ARGS: ( '--label org.opencontainers.image.revision="$GITHUB_SHA"'
@@ -60,7 +60,7 @@ jobs:
           export STORAGE_DRIVER=vfs  # allows to build inside containers without additional mounts
           export BUILDAH_FORMAT=docker  # enables ONBUILD instructions which are not OCI compatible
           export REGISTRY_IMAGE_TAG=latest  # for now
-          aws ecr get-login-password --region us-east-1 | buildah login --username AWS --password-stdin ${AWS_REPO_URL}
+          aws ecr get-login-password --region us-east-1 | buildah login --username AWS --password-stdin ${AWS_ECR_URL}
           # This is written like that in case $BUILDAH_EXTRA_ARGS has args that require spaces,
           # which is tricky with shell variable expansion.  Similar to Kaniko, see also:
           # https://github.com/GoogleContainerTools/kaniko/issues/1803
