@@ -16,6 +16,8 @@ jobs:
           ls /opt
       - name: use-composite-action
         uses: ./.github/actions/test
+        with:
+          TEST_SECRET: ${{ secrets.TEST_SECRET }}
   # run-on-aws-container:
   #   runs-on:
   #     - codebuild-spacktainers-${{ github.run_id }}-${{ github.run_attempt }}
