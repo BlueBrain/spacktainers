@@ -48,4 +48,4 @@ runs:
         echo "${COMMAND}"
         eval "${COMMAND}"
         # Sometimes buildah push fails on the first attempt
-        buildah push $(<image_id) "docker://${{ inputs.AWS_ECR_URL }}${{ inputs.AWS_ECR_PATH }}:${{ inputs.REGISTRY_IMAGE_TAG }}" || sleep 10; buildah push $(<image_id) "docker://${{ inputs.AWS_ECR_URL }}${{ inputs.AWS_ECR_PATH }}:${{ inputs.REGISTRY_IMAGE_TAG }}"
+        buildah push $(<image_id) "docker://${{ inputs.AWS_ECR_URL }}${{ inputs.AWS_ECR_PATH }}:${ REGISTRY_IMAGE_TAG }" || sleep 10; buildah push $(<image_id) "docker://${{ inputs.AWS_ECR_URL }}${{ inputs.AWS_ECR_PATH }}:${ REGISTRY_IMAGE_TAG }"
