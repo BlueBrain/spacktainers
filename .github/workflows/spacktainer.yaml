@@ -31,7 +31,7 @@ jobs:
           SPACK_DEPLOYMENT_KEY_PUB: ${{ secrets.SPACK_DEPLOYMENT_KEY_PUB }}
       - name: create runtime
         uses: ./.github/actions/build_base_container
-        env:
+        with:
           AWS_ECR_URL: ${{ secrets.AWS_ECR_URL }}
           AWS_ECR_PATH: /spacktainers/runtime
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ECR_ACCESS_KEY_ID }}
