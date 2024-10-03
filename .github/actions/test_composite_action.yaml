@@ -1,0 +1,13 @@
+---
+name: Test Composite Action
+description: test how composite actions work
+runs:
+  using: composite
+  steps:
+    - name: clone repo
+      uses: actions/checkout@v4
+    - name: Use a secret
+      env:
+        TEST_SECRET: ${{ secrets.TEST_SECRET }}
+      run: |-
+        echo "The secret is ${TEST_SECRET}"
