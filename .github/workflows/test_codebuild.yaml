@@ -15,7 +15,7 @@ jobs:
           uname -a
           ls /opt
       - name: use-composite-action
-        uses: ./.github/actions/test_composite_action.yaml
+        uses: ./.github/actions/test
   # run-on-aws-container:
   #   runs-on:
   #     - codebuild-spacktainers-${{ github.run_id }}-${{ github.run_attempt }}
