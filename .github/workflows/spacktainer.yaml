@@ -24,6 +24,7 @@ jobs:
             --label ch.epfl.bbpgitlab.ci-commit-branch="$GITHUB_REF_NAME"
             --build-arg SPACK_BRANCH=develop
           # ' --label org.opencontainers.image.created="$CI_JOB_STARTED_AT"'
+          SPACK_DEPLOYMENT_KEY_PUB: ${{ secrets.SPACK_DEPLOYMENT_KEY_PUB }}
         run: |-
           echo "Creating builder"
           set -x
@@ -31,6 +32,7 @@ jobs:
           export STORAGE_DRIVER=vfs  # allows to build inside containers without additional mounts
           export BUILDAH_FORMAT=docker  # enables ONBUILD instructions which are not OCI compatible
           export REGISTRY_IMAGE_TAG=latest  # for now
+          echo "${SPACK_DEPLOYMENT_KEY_PUB}" > builder/key.pub
           aws ecr get-login-password --region us-east-1 | buildah login --username AWS --password-stdin ${AWS_ECR_URL}
           # This is written like that in case $BUILDAH_EXTRA_ARGS has args that require spaces,
           # which is tricky with shell variable expansion.  Similar to Kaniko, see also:
