@@ -21,6 +21,12 @@ inputs:
     description: Extra args to pass to buildah
     required: false
     default: ''
+  DOCKERHUB_USER:
+    description: Username for Dockerhub authentication
+    required: true
+  DOCKERHUB_PASSWORD:
+    description: Password for Dockerhub authentication
+    required: true
   SPACK_DEPLOYMENT_KEY_PUB:
     description: Public key for spack deployments
     required: true
@@ -40,6 +46,7 @@ runs:
         export REGISTRY_IMAGE_TAG=latest  # for now
         echo "${{ inputs.SPACK_DEPLOYMENT_KEY_PUB }}" > ${{ inputs.BUILD_PATH }}/key.pub
         aws ecr get-login-password --region us-east-1 | buildah login --username AWS --password-stdin ${{ inputs.AWS_ECR_URL }}
+        buildah login --username ${{ inputs.DOCKERHUB_USER }} --password ${{ inputs.DOCKERHUB_PASSWORD }} docker.io
         # This is written like that in case $BUILDAH_EXTRA_ARGS has args that require spaces,
         # which is tricky with shell variable expansion.  Similar to Kaniko, see also:
         # https://github.com/GoogleContainerTools/kaniko/issues/1803
@@ -48,4 +55,4 @@ runs:
         echo "${COMMAND}"
         eval "${COMMAND}"
         # Sometimes buildah push fails on the first attempt
-        buildah push $(<image_id) "docker://${{ inputs.AWS_ECR_URL }}${{ inputs.AWS_ECR_PATH }}:${ REGISTRY_IMAGE_TAG }" || sleep 10; buildah push $(<image_id) "docker://${{ inputs.AWS_ECR_URL }}${{ inputs.AWS_ECR_PATH }}:${ REGISTRY_IMAGE_TAG }"
+        buildah push $(<image_id) "docker://${{ inputs.AWS_ECR_URL }}${{ inputs.AWS_ECR_PATH }}:${REGISTRY_IMAGE_TAG}" || sleep 10; buildah push $(<image_id) "docker://${{ inputs.AWS_ECR_URL }}${{ inputs.AWS_ECR_PATH }}:${REGISTRY_IMAGE_TAG}"
