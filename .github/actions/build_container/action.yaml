@@ -30,6 +30,9 @@ inputs:
   SPACK_DEPLOYMENT_KEY_PUB:
     description: Public key for spack deployments
     required: true
+  SPACK_DEPLOYMENT_KEY_PRIVATE:
+    description: Private key for spack deployments
+    required: true
 runs:
   using: composite
   steps:
@@ -45,6 +48,7 @@ runs:
         export BUILDAH_FORMAT=docker  # enables ONBUILD instructions which are not OCI compatible
         export REGISTRY_IMAGE_TAG=latest  # for now
         echo "${{ inputs.SPACK_DEPLOYMENT_KEY_PUB }}" > ${{ inputs.BUILD_PATH }}/key.pub
+        echo "${{ inputs.SPACK_DEPLOYMENT_KEY_PRIVATE }}" > ${{ inputs.BUILD_PATH }}/key
         aws ecr get-login-password --region us-east-1 | buildah login --username AWS --password-stdin ${{ inputs.AWS_ECR_URL }}
         buildah login --username ${{ inputs.DOCKERHUB_USER }} --password ${{ inputs.DOCKERHUB_PASSWORD }} docker.io
         # This is written like that in case $BUILDAH_EXTRA_ARGS has args that require spaces,
