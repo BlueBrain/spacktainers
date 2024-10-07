@@ -110,9 +110,6 @@ ONBUILD ARG MIRROR_AUTH_ARG
 ONBUILD ARG CACHE_BUCKET
 ONBUILD RUN if [ -n "${CACHE_BUCKET}" ] ; then echo spack mirror add --scope=site ${MIRROR_URL_ARG} ${MIRROR_AUTH_ARG} build_s3 s3://${CACHE_BUCKET}; fi
 ONBUILD RUN if [ -n "${CACHE_BUCKET}" ]; then spack mirror add --scope=site ${MIRROR_URL_ARG} ${MIRROR_AUTH_ARG} build_s3 s3://${CACHE_BUCKET}; fi
-ONBUILD RUN ls /opt
-ONBUILD RUN ls /opt/spack/bin
-ONBUILD RUN echo $PATH
 ONBUILD RUN spack config blame mirrors
 
 # Install the software, remove unnecessary deps
