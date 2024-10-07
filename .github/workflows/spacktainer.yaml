@@ -51,7 +51,7 @@ jobs:
   get-builder-image:
     runs-on: ubuntu-latest
     env:
-      builder_image: LINUX_IMAGE-${{ secrets.AWS_ECR_URL }}/spacktainers/builder:latest
+      builder_image: LINUX_IMAGE-${{ secrets.AWS_ECR_URL }}/spacktainers/runtime:latest
     steps:
       - name: Getting builder image
         run: |
