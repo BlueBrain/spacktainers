@@ -11,7 +11,7 @@ jobs:
      - name: clone repo
        uses: actions/checkout@v4
      - name: create builder
-       uses: ./.github/actions/build_base_container
+       uses: ./.github/actions/build_container
        with:
          AWS_ECR_URL: ${{ secrets.AWS_ECR_URL }}
          AWS_ECR_PATH: /spacktainers/builder
@@ -30,7 +30,7 @@ jobs:
          DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
          SPACK_DEPLOYMENT_KEY_PUB: ${{ secrets.SPACK_DEPLOYMENT_KEY_PUB }}
      - name: create runtime
-       uses: ./.github/actions/build_base_container
+       uses: ./.github/actions/build_container
        with:
          AWS_ECR_URL: ${{ secrets.AWS_ECR_URL }}
          AWS_ECR_PATH: /spacktainers/runtime
@@ -81,7 +81,7 @@ jobs:
           COPY --from=builder /etc/debian_version /etc/debian_version
           EOF
       - name: build touchdetector
-        uses: ./.github/actions/build_base_container
+        uses: ./.github/actions/build_container
         with:
           AWS_ECR_URL: ${{ secrets.AWS_ECR_URL }}
           AWS_ECR_PATH: /spacktainers/touch_detector
