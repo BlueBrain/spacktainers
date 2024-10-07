@@ -48,25 +48,13 @@ jobs:
          DOCKERHUB_USER: ${{ secrets.DOCKERHUB_USER }}
          DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
          SPACK_DEPLOYMENT_KEY_PUB: ${{ secrets.SPACK_DEPLOYMENT_KEY_PUB }}
-  get-builder-image:
-    runs-on: ubuntu-latest
-    env:
-      builder_image: LINUX_IMAGE-${{ secrets.AWS_ECR_URL }}/spacktainers/builder:latest
-    steps:
-      - name: Getting builder image
-        run: |
-          echo "We need at least one step, that's why this is here."
-    outputs:
-      builder: ${{ env.builder_image }}
   spacktainer-build-job:
     runs-on:
       - codebuild-spacktainers-${{ github.run_id }}-${{ github.run_attempt }}
-      - image:${{ needs.get-builder-image.outputs.builder }}
+      - image:ubuntu-7.0
       - instance-size:small
-      # - image:130659266700.dkr.ecr.us-east-1.amazonaws.com/spacktainers/runtime:latest
     needs:
      - base-container-job
-     - get-builder-image
     steps:
       - name: prepare to build container
         env:
