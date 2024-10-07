@@ -60,12 +60,10 @@ jobs:
     steps:
       - name: prepare to build container
         env:
-         aws_ecr_url: ${{ secrets.AWS_ECR_URL }}
+         AWS_ECR_URL: ${{ secrets.AWS_ECR_URL }}
         run: |-
           cd container_definitions/amd64/touch_detector
           cat << EOF > Dockerfile
-          FROM ${{ aws_ecr_url }}/spacktainers/builder:latest AS builder
-          FROM ${{ aws_ecr_url }}/spacktainers/runtime:latest
 
           # Triggers building the 'builder' image, otherwise it is optimized away
           COPY --from=builder /etc/debian_version /etc/debian_version
