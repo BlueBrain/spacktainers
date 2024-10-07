@@ -2,56 +2,56 @@
 name: Build Spacktainers
 on: [push]
 jobs:
-  # base-container-job:
-  #  runs-on:
-  #    - codebuild-spacktainers-${{ github.run_id }}-${{ github.run_attempt }}
-  #    - image:ubuntu-7.0
-  #    - instance-size:small
-  #  steps:
-  #    - name: clone repo
-  #      uses: actions/checkout@v4
-  #    - name: create builder
-  #      uses: ./.github/actions/build_base_container
-  #      with:
-  #        AWS_ECR_URL: ${{ secrets.AWS_ECR_URL }}
-  #        AWS_ECR_PATH: /spacktainers/builder
-  #        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ECR_ACCESS_KEY_ID }}
-  #        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_ECR_SECRET_ACCESS_KEY }}
-  #        BUILD_PATH: builder
-  #        BUILDAH_EXTRA_ARGS: --label org.opencontainers.image.revision="$GITHUB_SHA"
-  #          --label org.opencontainers.image.authors="$GITHUB_TRIGGERING_ACTOR" --label
-  #          org.opencontainers.image.url="https://github.com/${GITHUB_REPOSITORY}"
-  #          --label org.opencontainers.image.source="https://github.com/${GITHUB_REPOSITORY}"
-  #          --label ch.epfl.bbpgitlab.ci-pipeline-url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
-  #          --label ch.epfl.bbpgitlab.ci-commit-branch="$GITHUB_REF_NAME" --build-arg
-  #          SPACK_BRANCH=develop
-  #        # ' --label org.opencontainers.image.created="$CI_JOB_STARTED_AT"'
-  #        DOCKERHUB_USER: ${{ secrets.DOCKERHUB_USER }}
-  #        DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
-  #        SPACK_DEPLOYMENT_KEY_PUB: ${{ secrets.SPACK_DEPLOYMENT_KEY_PUB }}
-  #    - name: create runtime
-  #      uses: ./.github/actions/build_base_container
-  #      with:
-  #        AWS_ECR_URL: ${{ secrets.AWS_ECR_URL }}
-  #        AWS_ECR_PATH: /spacktainers/runtime
-  #        AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ECR_ACCESS_KEY_ID }}
-  #        AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_ECR_SECRET_ACCESS_KEY }}
-  #        BUILD_PATH: runtime
-  #        BUILDAH_EXTRA_ARGS: --label org.opencontainers.image.revision="$GITHUB_SHA"
-  #          --label org.opencontainers.image.authors="$GITHUB_TRIGGERING_ACTOR" --label
-  #          org.opencontainers.image.url="https://github.com/${GITHUB_REPOSITORY}"
-  #          --label org.opencontainers.image.source="https://github.com/${GITHUB_REPOSITORY}"
-  #          --label ch.epfl.bbpgitlab.ci-pipeline-url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
-  #          --label ch.epfl.bbpgitlab.ci-commit-branch="$GITHUB_REF_NAME" --build-arg
-  #          SPACK_BRANCH=develop
-  #        # ' --label org.opencontainers.image.created="$CI_JOB_STARTED_AT"'
-  #        DOCKERHUB_USER: ${{ secrets.DOCKERHUB_USER }}
-  #        DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
-  #        SPACK_DEPLOYMENT_KEY_PUB: ${{ secrets.SPACK_DEPLOYMENT_KEY_PUB }}
+  base-container-job:
+   runs-on:
+     - codebuild-spacktainers-${{ github.run_id }}-${{ github.run_attempt }}
+     - image:ubuntu-7.0
+     - instance-size:small
+   steps:
+     - name: clone repo
+       uses: actions/checkout@v4
+     - name: create builder
+       uses: ./.github/actions/build_base_container
+       with:
+         AWS_ECR_URL: ${{ secrets.AWS_ECR_URL }}
+         AWS_ECR_PATH: /spacktainers/builder
+         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ECR_ACCESS_KEY_ID }}
+         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_ECR_SECRET_ACCESS_KEY }}
+         BUILD_PATH: builder
+         BUILDAH_EXTRA_ARGS: --label org.opencontainers.image.revision="$GITHUB_SHA"
+           --label org.opencontainers.image.authors="$GITHUB_TRIGGERING_ACTOR" --label
+           org.opencontainers.image.url="https://github.com/${GITHUB_REPOSITORY}"
+           --label org.opencontainers.image.source="https://github.com/${GITHUB_REPOSITORY}"
+           --label ch.epfl.bbpgitlab.ci-pipeline-url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+           --label ch.epfl.bbpgitlab.ci-commit-branch="$GITHUB_REF_NAME" --build-arg
+           SPACK_BRANCH=develop
+         # ' --label org.opencontainers.image.created="$CI_JOB_STARTED_AT"'
+         DOCKERHUB_USER: ${{ secrets.DOCKERHUB_USER }}
+         DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
+         SPACK_DEPLOYMENT_KEY_PUB: ${{ secrets.SPACK_DEPLOYMENT_KEY_PUB }}
+     - name: create runtime
+       uses: ./.github/actions/build_base_container
+       with:
+         AWS_ECR_URL: ${{ secrets.AWS_ECR_URL }}
+         AWS_ECR_PATH: /spacktainers/runtime
+         AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ECR_ACCESS_KEY_ID }}
+         AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_ECR_SECRET_ACCESS_KEY }}
+         BUILD_PATH: runtime
+         BUILDAH_EXTRA_ARGS: --label org.opencontainers.image.revision="$GITHUB_SHA"
+           --label org.opencontainers.image.authors="$GITHUB_TRIGGERING_ACTOR" --label
+           org.opencontainers.image.url="https://github.com/${GITHUB_REPOSITORY}"
+           --label org.opencontainers.image.source="https://github.com/${GITHUB_REPOSITORY}"
+           --label ch.epfl.bbpgitlab.ci-pipeline-url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
+           --label ch.epfl.bbpgitlab.ci-commit-branch="$GITHUB_REF_NAME" --build-arg
+           SPACK_BRANCH=develop
+         # ' --label org.opencontainers.image.created="$CI_JOB_STARTED_AT"'
+         DOCKERHUB_USER: ${{ secrets.DOCKERHUB_USER }}
+         DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
+         SPACK_DEPLOYMENT_KEY_PUB: ${{ secrets.SPACK_DEPLOYMENT_KEY_PUB }}
   get-builder-image:
     runs-on: ubuntu-latest
     env:
-      builder_image: LINUX_IMAGE-${{ secrets.AWS_ECR_URL }}/spacktainers/runtime:latest
+      builder_image: LINUX_IMAGE-${{ secrets.AWS_ECR_URL }}/spacktainers/builder:latest
     steps:
       - name: Getting builder image
         run: |
@@ -61,9 +61,9 @@ jobs:
   spacktainer-build-job:
     runs-on:
       - codebuild-spacktainers-${{ github.run_id }}-${{ github.run_attempt }}
-      - image:130659266700.dkr.ecr.us-east-1.amazonaws.com/spacktainers/runtime:latest
+      - image:${{ needs.get-builder-image.outputs.builder }}
       - instance-size:small
-      # - image:${{ needs.get-builder-image.outputs.builder }}
+      # - image:130659266700.dkr.ecr.us-east-1.amazonaws.com/spacktainers/runtime:latest
     needs:
       # - base-container-job
      - get-builder-image
