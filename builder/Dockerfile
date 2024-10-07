@@ -1,6 +1,5 @@
 ARG BASE_IMAGE=ubuntu:24.04
-ARG MIRROR_URL=""
-ARG CACHE_BUCKET="s3://spack-build-cache"
+ARG CACHE_BUCKET="s3://spacktainers-cache-da4e51"
 ARG SPACK_BRANCH="develop"
 FROM $BASE_IMAGE as bootstrap
 
@@ -16,8 +15,6 @@ RUN apt-get update \
 
 # Yes, again. Line 1 by itself is not enough to export this ARG into the shell in RUN
 ARG BASE_IMAGE
-# BlueBrain internal S3 bucket
-ARG MIRROR_URL
 # For AWS S3 bucket
 ARG CACHE_BUCKET
 # Which branch to clone
@@ -66,15 +63,14 @@ RUN spack compiler find --scope=site \
 # OpenGL cannot be build by Spack
 RUN spack external find --scope=site opengl
 
+RUN spack config --scope=site add "config:install_tree:padded_length: 128"
+
 # Possible ARM customizations (require Spack sourced)
 # COPY acfl.sh acfl.sh
 # RUN ./acfl.sh
 
 # This will list any missing packages that should be installed via apt.
 RUN spack bootstrap now
-# Add the BBP build cache, this should only allow _read_ access.
-RUN echo "Mirror URL is .${MIRROR_URL}. and CACHE_BUCKET is .${CACHE_BUCKET}."
-RUN if [ -n "${MIRROR_URL}" ]; then spack mirror add --scope=site --s3-endpoint-url ${MIRROR_URL} bbpS3 ${CACHE_BUCKET}; fi
 
 # COPY key.pub key.pub
 # RUN spack gpg trust key.pub
@@ -84,8 +80,8 @@ FROM bootstrap as builder
 
 ENTRYPOINT ["/bin/bash", "/usr/local/bin/spack-env"]
 # on graviton runners, the CMD does not seem to get appended to the ENTRYPOINT
-#ENTRYPOINT ["/bin/bash", "/opt/spack/share/spack/docker/entrypoint.bash"]
-#CMD ["interactive-shell"]
+ENTRYPOINT ["/bin/bash", "/opt/spack/share/spack/docker/entrypoint.bash"]
+CMD ["interactive-shell"]
 
 # What we want to install and how we want to install it
 # is specified in a manifest file (spack.yaml)
@@ -108,9 +104,16 @@ ONBUILD RUN git config --list
 ONBUILD ARG MIRROR_URL_ARG
 ONBUILD ARG MIRROR_AUTH_ARG
 ONBUILD ARG CACHE_BUCKET
-ONBUILD RUN if [ -n "${CACHE_BUCKET}" ] ; then echo spack mirror add --scope=site ${MIRROR_URL_ARG} ${MIRROR_AUTH_ARG} build_s3 s3://${CACHE_BUCKET}; fi
-ONBUILD RUN if [ -n "${CACHE_BUCKET}" ]; then spack mirror add --scope=site ${MIRROR_URL_ARG} ${MIRROR_AUTH_ARG} build_s3 s3://${CACHE_BUCKET}; fi
+ONBUILD RUN if [ -n "${CACHE_BUCKET}" ]; then \
+                echo spack mirror add --scope=site --autopush ${MIRROR_URL_ARG} ${MIRROR_AUTH_ARG} build_s3 s3://${CACHE_BUCKET}; \
+                spack mirror add --scope=site --autopush ${MIRROR_URL_ARG} ${MIRROR_AUTH_ARG} build_s3 s3://${CACHE_BUCKET}; \
+            fi
 ONBUILD RUN spack config blame mirrors
+
+ONBUILD COPY key.pub spack_key.pub
+ONBUILD COPY key spack_key
+ONBUILD RUN spack gpg trust ./spack_key.pub
+ONBUILD RUN spack gpg trust ./spack_key
 
 # Install the software, remove unnecessary deps
 ONBUILD RUN cd /opt/spack-environment && \
