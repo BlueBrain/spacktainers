@@ -62,7 +62,7 @@ jobs:
     runs-on:
       - codebuild-spacktainers-${{ github.run_id }}-${{ github.run_attempt }}
       # - image:${{ needs.get-builder-image.outputs.builder }}
-      - image:LINUX_IMAGE-130659266700.dkr.ecr.us-east-1.amazonaws.com/spacktainers/runtime:latest
+      - image:130659266700.dkr.ecr.us-east-1.amazonaws.com/spacktainers/runtime:latest
       - instance-size:small
     needs:
       # - base-container-job
