@@ -64,6 +64,8 @@ jobs:
         run: |-
           cd container_definitions/amd64/touch_detector
           cat << EOF > Dockerfile
+          FROM ${ AWS_ECR_URL }/spacktainers/builder:latest AS builder
+          FROM ${ AWS_ECR_URL }/spacktainers/runtime:latest
 
           # Triggers building the 'builder' image, otherwise it is optimized away
           COPY --from=builder /etc/debian_version /etc/debian_version
