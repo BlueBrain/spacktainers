@@ -65,7 +65,7 @@ jobs:
       - instance-size:small
       # - image:130659266700.dkr.ecr.us-east-1.amazonaws.com/spacktainers/runtime:latest
     needs:
-      # - base-container-job
+     - base-container-job
      - get-builder-image
     steps:
       - name: configure-build-cache
