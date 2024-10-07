@@ -63,7 +63,7 @@ jobs:
       - codebuild-spacktainers-${{ github.run_id }}-${{ github.run_attempt }}
       - image:${{ needs.get-builder-image.outputs.builder }}
       - instance-size:small
-    needs: base-container-job
+    needs: [base-container-job, get-builder-image]
     steps:
       - name: configure-build-cache
         env:
