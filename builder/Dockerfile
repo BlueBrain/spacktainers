@@ -1,6 +1,7 @@
 ARG BASE_IMAGE=ubuntu:24.04
 ARG CACHE_BUCKET="s3://spacktainers-cache-da4e51"
-ARG SPACK_BRANCH="develop"
+ARG SPACK_BRANCH="d70e9e131d12d9c1ee9f155ecb44684999d1f593"
+ARG REPOS_BRANCH="develop"
 FROM $BASE_IMAGE as bootstrap
 
 ENV SPACK_ROOT=/opt/spack \
@@ -19,12 +20,16 @@ ARG BASE_IMAGE
 ARG CACHE_BUCKET
 # Which branch to clone
 ARG SPACK_BRANCH
+ARG REPOS_BRANCH
 
 SHELL ["/bin/bash", "--login", "-c"]
 
 RUN echo "Cloning spack branch $SPACK_BRANCH"
 RUN mkdir $SPACK_ROOT && cd $SPACK_ROOT \
-    && git clone --depth=1 --single-branch --branch $SPACK_BRANCH https://github.com/spack/spack.git . \
+    && git init -b haupt \
+    && git remote add origin https://github.com/spack/spack.git \
+    && git fetch --depth=1 origin $SPACK_BRANCH \
+    && git reset --hard FETCH_HEAD \
     && mkdir -p $SPACK_ROOT/opt/spack
 
 RUN ln -s $SPACK_ROOT/share/spack/docker/entrypoint.bash \
@@ -35,7 +40,7 @@ RUN ln -s $SPACK_ROOT/share/spack/docker/entrypoint.bash \
     /usr/local/bin/spack-env
 
 RUN mkdir $REPOS_ROOT && cd $REPOS_ROOT \
-    && git clone --depth=1 --single-branch --branch $SPACK_BRANCH https://github.com/BlueBrain/spack.git .
+    && git clone --depth=1 --single-branch --branch $REPOS_BRANCH https://github.com/BlueBrain/spack.git .
 
 RUN cp $SPACK_ROOT/share/spack/docker/modules.yaml \
     $SPACK_ROOT/etc/spack/modules.yaml \
@@ -63,7 +68,8 @@ RUN spack compiler find --scope=site \
 # OpenGL cannot be build by Spack
 RUN spack external find --scope=site opengl
 
-RUN spack config --scope=site add "config:install_tree:padded_length: 128"
+RUN spack config --scope=site add "config:install_tree:padded_length:128" \
+ && spack config --scope=site add "config:install_tree:root:/opt/software"
 
 # Possible ARM customizations (require Spack sourced)
 # COPY acfl.sh acfl.sh
@@ -116,8 +122,10 @@ ONBUILD RUN spack gpg trust ./spack_key.pub
 ONBUILD RUN spack gpg trust ./spack_key
 
 # Install the software, remove unnecessary deps
-ONBUILD RUN cd /opt/spack-environment && \
-    spack env activate . && \
+#
+# Unconditionally sets the view to /opt/view for the runtime container
+ONBUILD RUN spack env activate /opt/spack-environment; \
+    spack config add view:/opt/view && \
     spack concretize && \
     spack install --fail-fast && \
     spack gc -y
