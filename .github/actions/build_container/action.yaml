@@ -53,6 +53,9 @@ runs:
         # which is tricky with shell variable expansion.  Similar to Kaniko, see also:
         # https://github.com/GoogleContainerTools/kaniko/issues/1803
         export IFS=''
+        find container_definitions
+        echo "Contents of BUILD_PATH ${{ inputs.BUILD_PATH }}"
+        ls ${{ inputs.BUILD_PATH }}
         COMMAND="buildah bud --iidfile image_id ${{ inputs.BUILDAH_EXTRA_ARGS }} ${{ inputs.BUILD_PATH }}"
         echo "${COMMAND}"
         eval "${COMMAND}"
