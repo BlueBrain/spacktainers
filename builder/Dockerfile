@@ -39,13 +39,8 @@ RUN ln -s $SPACK_ROOT/share/spack/docker/entrypoint.bash \
     && ln -s $SPACK_ROOT/share/spack/docker/entrypoint.bash \
     /usr/local/bin/spack-env
 
-RUN mkdir $REPOS_ROOT && cd $REPOS_ROOT \
-    && git clone --depth=1 --single-branch --branch $REPOS_BRANCH https://github.com/BlueBrain/spack.git .
-
 RUN cp $SPACK_ROOT/share/spack/docker/modules.yaml \
     $SPACK_ROOT/etc/spack/modules.yaml \
-    && cp $REPOS_ROOT/bluebrain/sysconfig/containers/packages.yaml \
-    $REPOS_ROOT/etc/spack/packages.yaml \
     && rm -rf /root/*.* /run/nologin $SPACK_ROOT/.git
 
 # [WORKAROUND]
@@ -58,10 +53,6 @@ RUN [ -f ~/.profile ]                                               \
 WORKDIR /root
 SHELL ["docker-shell"]
 
-# Add custom repositories: order matters, last one will be preferred
-RUN spack repo add --scope=site $REPOS_ROOT/bluebrain/repo-patches
-RUN spack repo add --scope=site $REPOS_ROOT/bluebrain/repo-bluebrain
-
 # Creates the package cache
 RUN spack compiler find --scope=site \
     && spack compiler list
@@ -69,7 +60,7 @@ RUN spack compiler find --scope=site \
 RUN spack external find --scope=site opengl
 
 RUN spack config --scope=site add "config:install_tree:padded_length:128" \
- && spack config --scope=site add "config:install_tree:root:/opt/software"
+    && spack config --scope=site add "config:install_tree:root:/opt/software"
 
 # Possible ARM customizations (require Spack sourced)
 # COPY acfl.sh acfl.sh
@@ -111,10 +102,19 @@ ONBUILD ARG MIRROR_URL_ARG
 ONBUILD ARG MIRROR_AUTH_ARG
 ONBUILD ARG CACHE_BUCKET
 ONBUILD RUN if [ -n "${CACHE_BUCKET}" ]; then \
-                echo spack mirror add --scope=site --autopush ${MIRROR_URL_ARG} ${MIRROR_AUTH_ARG} build_s3 s3://${CACHE_BUCKET}; \
-                spack mirror add --scope=site --autopush ${MIRROR_URL_ARG} ${MIRROR_AUTH_ARG} build_s3 s3://${CACHE_BUCKET}; \
-            fi
+    echo spack mirror add --scope=site --autopush ${MIRROR_URL_ARG} ${MIRROR_AUTH_ARG} build_s3 s3://${CACHE_BUCKET}; \
+    spack mirror add --scope=site --autopush ${MIRROR_URL_ARG} ${MIRROR_AUTH_ARG} build_s3 s3://${CACHE_BUCKET}; \
+    fi
 ONBUILD RUN spack config blame mirrors
+
+ONBUILD RUN mkdir $REPOS_ROOT && cd $REPOS_ROOT \
+    && git clone --depth=1 --single-branch --branch $REPOS_BRANCH https://github.com/BlueBrain/spack.git . \
+    && cp $REPOS_ROOT/bluebrain/sysconfig/containers/packages.yaml \
+    $REPOS_ROOT/etc/spack/packages.yaml
+
+# Add custom repositories: order matters, last one will be preferred
+ONBUILD RUN spack repo add --scope=site $REPOS_ROOT/bluebrain/repo-patches
+ONBUILD RUN spack repo add --scope=site $REPOS_ROOT/bluebrain/repo-bluebrain
 
 ONBUILD COPY key.pub spack_key.pub
 ONBUILD COPY key spack_key
@@ -126,6 +126,8 @@ ONBUILD RUN spack gpg trust ./spack_key
 # Unconditionally sets the view to /opt/view for the runtime container
 ONBUILD RUN spack env activate /opt/spack-environment; \
     spack config add view:/opt/view && \
+    spack config add packages:all:require:target=x86_64_v3 && \
+    spack config add concretizer:targets:granularity:generic && \
     spack concretize && \
     spack install --fail-fast && \
     spack gc -y
