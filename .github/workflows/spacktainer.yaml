@@ -2,7 +2,7 @@
 name: Build Spacktainers
 on: [push]
 jobs:
-  base-container-job:
+  builder-container-job:
     runs-on:
       - codebuild-spacktainers-${{ github.run_id }}-${{ github.run_attempt }}
       - image:ubuntu-7.0
@@ -30,6 +30,14 @@ jobs:
           DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
           SPACK_DEPLOYMENT_KEY_PUB: ${{ secrets.SPACK_DEPLOYMENT_KEY_PUB }}
           SPACK_DEPLOYMENT_KEY_PRIVATE: ${{ secrets.SPACK_DEPLOYMENT_KEY_PRIVATE }}
+  runtime-container-job:
+    runs-on:
+      - codebuild-spacktainers-${{ github.run_id }}-${{ github.run_attempt }}
+      - image:ubuntu-7.0
+      - instance-size:small
+    steps:
+      - name: clone repo
+        uses: actions/checkout@v4
       - name: create runtime
         uses: ./.github/actions/build_container
         with:
@@ -55,7 +63,7 @@ jobs:
       - codebuild-spacktainers-${{ github.run_id }}-${{ github.run_attempt }}
       - image:ubuntu-7.0
       - instance-size:small
-    needs: [base-container-job]
+    needs: [builder-container-job, runtime-container-job]
     steps:
       - name: clone repo
         uses: actions/checkout@v4
