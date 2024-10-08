@@ -94,7 +94,7 @@ jobs:
             --label ch.epfl.bbpgitlab.ci-pipeline-url="$GITHUB_SERVER_URL/$GITHUB_REPOSITORY/actions/runs/$GITHUB_RUN_ID"
             --label ch.epfl.bbpgitlab.ci-commit-branch="$GITHUB_REF_NAME" --build-arg
             SPACK_BRANCH=develop --build-arg CACHE_BUCKET=${{ secrets.AWS_CACHE_BUCKET }}
-            --build-arg MIRROR_S3_ACCESS_KEY="\"--s3-access-key-id='${{ secrets.AWS_CACHE_ACCESS_KEY_ID }}
+            --build-arg MIRROR_AUTH_ARG="\"--s3-access-key-id='${{ secrets.AWS_CACHE_ACCESS_KEY_ID }}
             --s3-access-key-secret=${{ secrets.AWS_CACHE_SECRET_ACCESS_KEY }}'\""
           # ' --label org.opencontainers.image.created="$CI_JOB_STARTED_AT"'
           DOCKERHUB_USER: ${{ secrets.DOCKERHUB_USER }}
