@@ -100,6 +100,7 @@ ONBUILD RUN git config --list
 
 ONBUILD ARG MIRROR_URL_ARG
 ONBUILD ARG MIRROR_AUTH_ARG
+ONBUILD ARG REPOS_BRANCH="develop"
 ONBUILD ARG CACHE_BUCKET
 ONBUILD RUN if [ -n "${CACHE_BUCKET}" ]; then \
     echo spack mirror add --scope=site --autopush ${MIRROR_URL_ARG} ${MIRROR_AUTH_ARG} build_s3 s3://${CACHE_BUCKET}; \
