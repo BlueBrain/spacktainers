@@ -36,14 +36,12 @@ inputs:
 runs:
   using: composite
   steps:
-    - name: clone repo
-      uses: actions/checkout@v4
     - name: create builder
       shell: bash
       run: |-
-        echo "Creating ${{ inputs.BUILD_PATH }}"
+        echo "Building container in ${{ inputs.BUILD_PATH }}"
         set -x
-        apt install -y awscli buildah podman
+        apt-get install -y awscli buildah podman
         export STORAGE_DRIVER=vfs  # allows to build inside containers without additional mounts
         export BUILDAH_FORMAT=docker  # enables ONBUILD instructions which are not OCI compatible
         export REGISTRY_IMAGE_TAG=latest  # for now
