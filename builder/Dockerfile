@@ -108,9 +108,7 @@ ONBUILD RUN if [ -n "${CACHE_BUCKET}" ]; then \
 ONBUILD RUN spack config blame mirrors
 
 ONBUILD RUN mkdir $REPOS_ROOT && cd $REPOS_ROOT \
-    && git clone --depth=1 --single-branch --branch $REPOS_BRANCH https://github.com/BlueBrain/spack.git . \
-    && cp $REPOS_ROOT/bluebrain/sysconfig/containers/packages.yaml \
-    $REPOS_ROOT/etc/spack/packages.yaml
+    && git clone --depth=1 --single-branch --branch $REPOS_BRANCH https://github.com/BlueBrain/spack.git .
 
 # Add custom repositories: order matters, last one will be preferred
 ONBUILD RUN spack repo add --scope=site $REPOS_ROOT/bluebrain/repo-patches
