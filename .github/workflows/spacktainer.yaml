@@ -58,6 +58,8 @@ jobs:
     needs:
      - base-container-job
     steps:
+      - name: clone repo
+        uses: actions/checkout@v4
       - name: prepare to build container
         env:
          AWS_ECR_URL: ${{ secrets.AWS_ECR_URL }}
