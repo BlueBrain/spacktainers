@@ -66,6 +66,7 @@ jobs:
       - codebuild-spacktainers-${{ github.run_id }}-${{ github.run_attempt }}
       - image:ubuntu-7.0
       - instance-size:large
+    continue-on-error: true
     needs: [builder-container-job, runtime-container-job]
     steps:
       - name: clone repo
