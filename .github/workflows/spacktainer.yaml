@@ -71,7 +71,7 @@ jobs:
         env:
           AWS_ECR_URL: ${{ secrets.AWS_ECR_URL }}
         run: |-
-          cd container_definitions/amd64/touchdetector
+          cd container_definitions/amd64/py-brain-indexer
           cat << EOF > Dockerfile
           FROM ${AWS_ECR_URL}/spacktainers/builder:latest AS builder
           FROM ${AWS_ECR_URL}/spacktainers/runtime:latest
@@ -79,14 +79,14 @@ jobs:
           # Triggers building the 'builder' image, otherwise it is optimized away
           COPY --from=builder /etc/debian_version /etc/debian_version
           EOF
-      - name: build touchdetector
+      - name: build py-brain-indexer
         uses: ./.github/actions/build_container
         with:
           AWS_ECR_URL: ${{ secrets.AWS_ECR_URL }}
-          AWS_ECR_PATH: /spacktainers/touchdetector
+          AWS_ECR_PATH: /spacktainers/py-brain-indexer
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ECR_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_ECR_SECRET_ACCESS_KEY }}
-          BUILD_PATH: container_definitions/amd64/touchdetector
+          BUILD_PATH: container_definitions/amd64/py-brain-indexer
           BUILDAH_EXTRA_ARGS: --label org.opencontainers.image.revision="$GITHUB_SHA"
             --label org.opencontainers.image.authors="$GITHUB_TRIGGERING_ACTOR" --label
             org.opencontainers.image.url="https://github.com/${GITHUB_REPOSITORY}"
