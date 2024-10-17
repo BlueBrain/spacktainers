@@ -62,7 +62,6 @@ jobs:
         spacktainer: [py-brain-indexer, brayns]
     runs-on:
       - codebuild-spacktainers-tf-${{ github.run_id }}-${{ github.run_attempt }}
-      - instance-size:xlarge
     continue-on-error: true
     needs: [builder-container-job, runtime-container-job]
     steps:
