@@ -41,6 +41,7 @@ runs:
       run: |-
         echo "Building container in ${{ inputs.BUILD_PATH }}"
         set -x
+        apt-get update
         apt-get install -y awscli buildah podman
         export STORAGE_DRIVER=vfs  # allows to build inside containers without additional mounts
         export BUILDAH_FORMAT=docker  # enables ONBUILD instructions which are not OCI compatible
