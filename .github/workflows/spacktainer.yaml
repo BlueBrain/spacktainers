@@ -4,7 +4,7 @@ on: [push]
 jobs:
   builder-container-job:
     runs-on:
-      - codebuild-spacktainers-${{ github.run_id }}-${{ github.run_attempt }}
+      - codebuild-spacktainers-tf-${{ github.run_id }}-${{ github.run_attempt }}
       - instance-size:small
     steps:
       - name: clone repo
@@ -31,7 +31,7 @@ jobs:
           SPACK_DEPLOYMENT_KEY_PRIVATE: ${{ secrets.SPACK_DEPLOYMENT_KEY_PRIVATE }}
   runtime-container-job:
     runs-on:
-      - codebuild-spacktainers-${{ github.run_id }}-${{ github.run_attempt }}
+      - codebuild-spacktainers-tf-${{ github.run_id }}-${{ github.run_attempt }}
       - instance-size:small
     steps:
       - name: clone repo
@@ -61,7 +61,7 @@ jobs:
       matrix:
         spacktainer: [py-brain-indexer, brayns]
     runs-on:
-      - codebuild-spacktainers-${{ github.run_id }}-${{ github.run_attempt }}
+      - codebuild-spacktainers-tf-${{ github.run_id }}-${{ github.run_attempt }}
       - instance-size:xlarge
     continue-on-error: true
     needs: [builder-container-job, runtime-container-job]
