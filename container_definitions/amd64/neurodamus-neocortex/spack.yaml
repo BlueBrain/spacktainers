@@ -1,0 +1,7 @@
+spack:
+  specs:
+    - neurodamus-models model=neocortex ~plasticity+coreneuron+caliper
+  packages:
+    all:
+      providers:
+        mpi: [mpich]
