@@ -4,3 +4,6 @@ spack:
   packages:
     py-numpy-quaternion:
       require: "~numba~scipy"
+    all:
+      providers:
+        mpi: [mpich]
