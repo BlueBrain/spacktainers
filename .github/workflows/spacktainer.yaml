@@ -59,7 +59,10 @@ jobs:
   spacktainer-build-job:
     strategy:
       matrix:
-        spacktainer: [py-brain-indexer, brayns]
+        spacktainer:
+          - brain-indexer
+          - brayns
+          - neurodamus-neocortex
     runs-on:
       - codebuild-spacktainers-tf-${{ github.run_id }}-${{ github.run_attempt }}
     continue-on-error: true
