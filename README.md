@@ -129,6 +129,46 @@ The main entrypoints can be found, unsurprisingly, in the `__main__.py` file. Th
 
 `utils.py` contains utility functions for reading/writing yaml, getting the multiarch job for a container, ...
 
+## Reproducing GitHub Action builds locally
+
+Prerequisites needed to try the container building locally:
+
+1. The upstream Spack commit we are using in the
+   [`builder/Dockerfile`](builder/Dockerfile), in the argument `SPACK_BRANCH` (may be
+   overwritten by the CI).  Referred to as `${SPACK_BRANCH}` here.
+2. Access to the S3 bucket that holds the binary cache, denoted by the `CACHE_BUCKET`
+   argument in the same file.  Referred to as `${CACHE_BUCKET}` here.
+
+Set up upstream Spack, and source it:
+```
+gh repo clone spack/spack
+cd spack
+git fetch --depth=1 origin ${SPACK_BRANCH}
+git reset --hard FETCH_HEAD
+. ./share/spack/setup-env.sh
+cd ..
+```
+Then clone our own Spack fork and add the repositories:
+```
+gh repo clone BlueBrain/spack spack-blue
+spack repo add --scope=site spack-blue/bluebrain/repo-patches
+spack repo add --scope=site spack-blue/bluebrain/repo-bluebrain
+```
+Configure the mirror and set the generic architecture:
+```
+spack mirror add --scope=site build_s3 ${CACHE_BUCKET}
+spack config --scope=site add packages:all:require:target=x86_64_v3
+```
+Now the basic Spack installation should be ready to use and pull from the build cache.
+
+Then one may pick a container specification and create environments from it, i.e.:
+```
+spack env create brindex spacktainers/container_definitions/amd64/py-brain-indexer/spack.yaml
+spack env activate brindex
+spack concretize -f
+spack install
+```
+
 # Acknowledgment
 
 The development of this software was supported by funding to the Blue Brain Project,
