@@ -30,7 +30,6 @@ RUN mkdir $SPACK_ROOT && cd $SPACK_ROOT \
     && git remote add origin https://github.com/spack/spack.git \
     && git fetch --depth=1 origin $SPACK_BRANCH \
     && git reset --hard FETCH_HEAD \
-    && mkdir -p $SPACK_ROOT/opt/spack
 
 RUN ln -s $SPACK_ROOT/share/spack/docker/entrypoint.bash \
     /usr/local/bin/docker-shell \
@@ -100,7 +99,7 @@ ONBUILD RUN git config --list
 
 ONBUILD ARG MIRROR_URL_ARG
 ONBUILD ARG MIRROR_AUTH_ARG
-ONBUILD ARG REPOS_BRANCH="develop"
+ONBUILD ARG REPOS_BRANCH="matz-e/spacktainer-readiness"
 ONBUILD ARG CACHE_BUCKET
 ONBUILD RUN if [ -n "${CACHE_BUCKET}" ]; then \
     echo spack mirror add --scope=site --autopush ${MIRROR_URL_ARG} ${MIRROR_AUTH_ARG} build_s3 s3://${CACHE_BUCKET}; \
