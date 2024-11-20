@@ -29,7 +29,7 @@ RUN mkdir $SPACK_ROOT && cd $SPACK_ROOT \
     && git init -b haupt \
     && git remote add origin https://github.com/spack/spack.git \
     && git fetch --depth=1 origin $SPACK_BRANCH \
-    && git reset --hard FETCH_HEAD \
+    && git reset --hard FETCH_HEAD
 
 RUN ln -s $SPACK_ROOT/share/spack/docker/entrypoint.bash \
     /usr/local/bin/docker-shell \
