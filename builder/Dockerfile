@@ -1,7 +1,7 @@
 ARG BASE_IMAGE=ubuntu:24.04
 ARG CACHE_BUCKET="s3://spacktainers-cache-da4e51"
 ARG SPACK_BRANCH="fdedb6f95d09c7f7a78ebce827ba0092b82c8f21"
-ARG REPOS_BRANCH="develop"
+ARG REPOS_BRANCH="matz-e/spacktainer-readiness"
 FROM $BASE_IMAGE as bootstrap
 
 ENV SPACK_ROOT=/opt/spack \
