@@ -60,9 +60,11 @@ jobs:
     strategy:
       matrix:
         spacktainer:
+          - appositionizer
           - brain-indexer
           - brayns
           - functionalizer
+          - neurodamus-hippocampus
           - neurodamus-neocortex
     runs-on:
       - codebuild-spacktainers-tf-${{ github.run_id }}-${{ github.run_attempt }}
