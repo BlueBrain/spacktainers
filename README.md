@@ -9,7 +9,7 @@ This repository aims to be the one-stop shop for all of our container needs.
 
 ## Defining containers
 
-The only files you should have to edit as an end-user are located in the `container_definitions` folder. There's a subfolder per architecture (currently supported: `amd64` and `arm64`) under which both `yaml` and `def` files can live.
+The only files you should have to edit as an end-user are located in the `container_definitions` folder. There's a subfolder per architecture (currently supported: `amd64` and `arm64`) under which both `yaml` (in subdirectories) and `def` files can live.
 * A YAML file file defines a Spack container - in it you can define the Spack specs as you would in a Spack environment. If you have specific requirements for dependencies, you can add `spack: packages: ...` keys to define those, again, as in a Spack environment.
 * A def file defines a singularity container that will be built from an existing container on docker-hub. nexus-storage is already defined for amd64 as an example.
 
@@ -45,37 +45,14 @@ spacktainer:
 
 # Developer documentation
 
-## Components
-
-* Spacktainerizer: the base image which contains our spack fork
-* Singularitah: arm64 container with singularity and s3cmd installation for sif manipulation on arm nodes
-* Spack-cacher: builds spack packages and puts them in a build cache
-* Spackitor: cleans the build cache: anything that is too old or no longer used gets removed
-* Spackah: builds the actual containers
-
 ## Build Order
 
 1. base containers
    * Build runtime / builder
-   * Build singularitah
-2. packages
-   * Build cache
-3. containers
+2. application containers
    * Build containers
+     * Every package build will be pushed to the cash directly after build
    * Publish containers
-
-## Pipeline logic
-
-While the pipeline is organised in stages, jobs jump the queue wherever they can to optimise build times. As such, we'll ignore the stages here and look at the actual execution order:
-* `generate base pipeline`: the "entrypoint" that will generate the necessary jobs to:
-    * build the builder, runtime and singularitah containers if necessary. These containers will be built only for the architectures needed for the final containers. These jobs will be generated only for the containers that need to be built.
-    * run `spack ci generate` and process its output. This is needed because Gitlab imposes a fairly tight restriction on how large a YAML file can be and Spack can easily surpass that. To work around this, we take the output YAML and split it into multiple pipelines along the generated stages.
-    * Clean the build cache buckets
-* `base containers and pipeline generation`: will run the pipeline that was generated in the first step
-* `gather child artifacts`: will collect the yaml generated in the `base containers and pipeline generation` child pipeline. This is needed because Gitlab doesn't allow triggering artifacts from a child pipeline
-* `populate buildcache for amd64`: run the jobs that `spack ci generate` produced in order to populate the buildcache
-* `build spacktainers for amd64`: this workflow was also generated in the `base containers and pipeline generation` child pipeline and will build the actual containers, if necessary.
-
 
 ## CI/CD Variables
 
@@ -86,12 +63,6 @@ While the pipeline is organised in stages, jobs jump the queue wherever they can
 * `SPACK_DEPLOYMENT_KEY_PUBLIC`: the Spack public deployment key (as a file!)
 * `DOCKERHUB_USER` / `DOCKERHUB_PASSWORD`: credentials for docker hub
 * `GITLAB_API_TOKEN`: private (!) gitlab token with API_READ access (CI_JOB_TOKEN does not have enough permissions). Change this once I'm gone
-
-## Base containers
-
-* [Singularitah](bbpgitlab.epfl.ch:5050/hpc/spacktainers/singularitah)
-* [Builder](bbpgitlab.epfl.ch:5050/hpc/spacktainers/builder)
-* [Runner](bbpgitlab.epfl.ch:5050/hpc/spacktainers/runtime)
 
 ## Repository layout
 
@@ -129,6 +100,59 @@ The main entrypoints can be found, unsurprisingly, in the `__main__.py` file. Th
 
 `utils.py` contains utility functions for reading/writing yaml, getting the multiarch job for a container, ...
 
+## Pulling images with Sarus or Podman
+
+Make sure you have your AWS credentials set up.  Then identify the image you want to run.
+In the following, `spacktainers/neurodamus-neocortex` is going to be used.  Identify the
+URL of the registry:
+```
+❯ aws ecr describe-repositories --repository-names spacktainers/neurodamus-neocortex
+{
+    "repositories": [
+        {
+            "repositoryArn": "arn:aws:ecr:us-east-1:130659266700:repository/spacktainers/neurodamus-neocortex",
+            "registryId": "130659266700",
+            "repositoryName": "spacktainers/neurodamus-neocortex",
+            "repositoryUri": "130659266700.dkr.ecr.us-east-1.amazonaws.com/spacktainers/neurodamus-neocortex",
+            "createdAt": "2024-11-20T17:32:11.169000+01:00",
+            "imageTagMutability": "MUTABLE",
+            "imageScanningConfiguration": {
+                "scanOnPush": false
+            },
+            "encryptionConfiguration": {
+                "encryptionType": "AES256"
+            }
+        }
+    ]
+}
+
+```
+Note the `repositoryUri` key. This will be used to log in with either Podman or Sarus.
+
+Get a login token from AWS:
+```
+❯ aws ecr get-login-password
+[secret]
+```
+
+### Pulling with Podman
+
+Log into the registry, using `AWS` as the username:
+```
+❯ podman login 130659266700.dkr.ecr.us-east-1.amazonaws.com
+```
+Then pull the full `repositoryUri`:
+```
+❯ podman pull 130659266700.dkr.ecr.us-east-1.amazonaws.com/spacktainers/neurodamus-neocortex
+```
+
+### Pulling with Sarus
+
+Everything in Sarus goes into one command:
+```
+❯ sarus pull --login -u AWS 130659266700.dkr.ecr.us-east-1.amazonaws.com/spacktainers/neurodamus-neocortex
+```
+
 ## Reproducing GitHub Action builds locally
 
 Prerequisites needed to try the container building locally:
@@ -141,32 +165,32 @@ Prerequisites needed to try the container building locally:
 
 Set up upstream Spack, and source it:
 ```
-gh repo clone spack/spack
-cd spack
-git fetch --depth=1 origin ${SPACK_BRANCH}
-git reset --hard FETCH_HEAD
-. ./share/spack/setup-env.sh
-cd ..
+❯ gh repo clone spack/spack
+❯ cd spack
+❯ git fetch --depth=1 origin ${SPACK_BRANCH}
+❯ git reset --hard FETCH_HEAD
+❯ . ./share/spack/setup-env.sh
+❯ cd ..
 ```
 Then clone our own Spack fork and add the repositories:
 ```
-gh repo clone BlueBrain/spack spack-blue
-spack repo add --scope=site spack-blue/bluebrain/repo-patches
-spack repo add --scope=site spack-blue/bluebrain/repo-bluebrain
+❯ gh repo clone BlueBrain/spack spack-blue
+❯ spack repo add --scope=site spack-blue/bluebrain/repo-patches
+❯ spack repo add --scope=site spack-blue/bluebrain/repo-bluebrain
 ```
 Configure the mirror and set the generic architecture:
 ```
-spack mirror add --scope=site build_s3 ${CACHE_BUCKET}
-spack config --scope=site add packages:all:require:target=x86_64_v3
+❯ spack mirror add --scope=site build_s3 ${CACHE_BUCKET}
+❯ spack config --scope=site add packages:all:require:target=x86_64_v3
 ```
 Now the basic Spack installation should be ready to use and pull from the build cache.
 
 Then one may pick a container specification and create environments from it, i.e.:
 ```
-spack env create brindex spacktainers/container_definitions/amd64/py-brain-indexer/spack.yaml
-spack env activate brindex
-spack concretize -f
-spack install
+❯ spack env create brindex spacktainers/container_definitions/amd64/py-brain-indexer/spack.yaml
+❯ spack env activate brindex
+❯ spack concretize -f
+❯ spack install
 ```
 
 # Acknowledgment

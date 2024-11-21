@@ -1,0 +1,4 @@
+spack:
+  specs:
+    - parquet-converters
+    - py-functionalizer
