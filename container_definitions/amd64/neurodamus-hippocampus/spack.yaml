@@ -1,3 +1,7 @@
 spack:
   specs:
     - neurodamus-models+coreneuron+caliper model=hippocampus
+  packages:
+    all:
+      providers:
+        mpi: [mpich]

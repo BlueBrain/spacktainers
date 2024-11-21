@@ -1,7 +1,6 @@
 spack:
   specs:
-    - parquet-converters
-    - py-functionalizer
+    - appositionizer
   packages:
     all:
       providers:
