@@ -61,6 +61,15 @@ RUN spack external find --scope=site opengl
 RUN spack config --scope=site add "config:install_tree:padded_length:128" \
     && spack config --scope=site add "config:install_tree:root:/opt/software"
 
+# Set up our repos, ONBUILD will update this
+RUN mkdir $REPOS_ROOT && cd $REPOS_ROOT \
+    && pwd && echo $REPOS_ROOT && echo $REPOS_BRANCH && ls -al \
+    && git clone --depth=1 --single-branch --branch $REPOS_BRANCH https://github.com/BlueBrain/spack.git .
+
+# Add custom repositories: order matters, last one will be preferred
+RUN spack repo add --scope=site $REPOS_ROOT/bluebrain/repo-patches
+RUN spack repo add --scope=site $REPOS_ROOT/bluebrain/repo-bluebrain
+
 # Possible ARM customizations (require Spack sourced)
 # COPY acfl.sh acfl.sh
 # RUN ./acfl.sh
@@ -107,13 +116,10 @@ ONBUILD RUN if [ -n "${CACHE_BUCKET}" ]; then \
     fi
 ONBUILD RUN spack config blame mirrors
 
-ONBUILD RUN mkdir $REPOS_ROOT && cd $REPOS_ROOT \
-    && pwd && echo $REPOS_ROOT && echo $REPOS_BRANCH && ls -al \
-    && git clone --depth=1 --single-branch --branch $REPOS_BRANCH https://github.com/BlueBrain/spack.git .
-
-# Add custom repositories: order matters, last one will be preferred
-ONBUILD RUN spack repo add --scope=site $REPOS_ROOT/bluebrain/repo-patches
-ONBUILD RUN spack repo add --scope=site $REPOS_ROOT/bluebrain/repo-bluebrain
+# Update our repos
+ONBUILD RUN cd $REPOS_ROOT \
+    && git fetch --depth=1 origin $REPOS_BRANCH \
+    && git reset --hard FETCH_HEAD
 
 ONBUILD COPY key.pub spack_key.pub
 ONBUILD COPY key spack_key
