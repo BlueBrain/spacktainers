@@ -63,6 +63,7 @@ jobs:
           - appositionizer
           - brain-indexer
           - brayns
+          - connectome-manipulator
           - functionalizer
           - neurodamus-hippocampus
           - neurodamus-neocortex

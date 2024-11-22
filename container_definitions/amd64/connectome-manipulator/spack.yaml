@@ -1,0 +1,8 @@
+spack:
+  specs:
+    - parquet-converters
+    - py-connectome-manipulator
+  packages:
+    all:
+      providers:
+        mpi: [mpich]
