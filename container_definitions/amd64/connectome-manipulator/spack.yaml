@@ -3,6 +3,8 @@ spack:
     - parquet-converters
     - py-connectome-manipulator
   packages:
+    py-pandas:
+      require: "~performance"  # Otherwise pulls in numba that requires outdated LLVM
     all:
       providers:
         mpi: [mpich]
