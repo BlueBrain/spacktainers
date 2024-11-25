@@ -139,7 +139,7 @@ Get a login token from AWS:
 
 Log into the registry, using `AWS` as the username:
 ```
-❯ podman login 130659266700.dkr.ecr.us-east-1.amazonaws.com
+❯ aws ecr get-login-password|podman login -u AWS --password-stdin 130659266700.dkr.ecr.us-east-1.amazonaws.com
 ```
 Then pull the full `repositoryUri`:
 ```
@@ -152,6 +152,21 @@ Everything in Sarus goes into one command:
 ```
 ❯ sarus pull --login -u AWS 130659266700.dkr.ecr.us-east-1.amazonaws.com/spacktainers/neurodamus-neocortex
 ```
+
+## Reproducing GitHub Action builds containerized
+
+See above instructions under [pulling containers](#user-content-pulling-with-podman) to
+login and pull the `spacktainers/builder` container.
+Then launch the container and install something, i.e., with:
+```
+❯ podman run -it 130659266700.dkr.ecr.us-east-1.amazonaws.com/spacktainers/builder
+root@43dec0527c62:/# (cd /opt/spack-repos/ && git pull)
+Already up to date.
+root@43dec0527c62:/# spack install zlib
+[...]
+```
+Environments may be recreated as present under
+[`container_definitions/`][(./container_definitions).
 
 ## Reproducing GitHub Action builds locally
 
