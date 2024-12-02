@@ -2,6 +2,9 @@ spack:
   specs:
     - py-multiscale-run
   packages:
+    petsc:
+      require:
+        - "~hypre"  # Hypre fails to compile
     py-pandas:
       require: "~performance"  # Otherwise pulls in numba that requires outdated LLVM
     py-numpy-quaternion:
