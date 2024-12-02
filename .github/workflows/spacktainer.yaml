@@ -65,6 +65,7 @@ jobs:
           - brayns
           - connectome-manipulator
           - functionalizer
+          - multiscale-run
           - neurodamus-hippocampus
           - neurodamus-neocortex
     runs-on:
