@@ -68,6 +68,7 @@ jobs:
           - multiscale-run
           - neurodamus-hippocampus
           - neurodamus-neocortex
+          - system-benchmarks
     runs-on:
       - codebuild-spacktainers-tf-${{ github.run_id }}-${{ github.run_attempt }}
     continue-on-error: true
