@@ -134,7 +134,7 @@ ONBUILD RUN spack env activate /opt/spack-environment; \
     spack config add packages:all:require:target=x86_64_v3 && \
     spack config add concretizer:targets:granularity:generic && \
     spack concretize && \
-    spack install --fail-fast && \
+    spack install --show-log-on-error --fail-fast && \
     spack gc -y
 
 ONBUILD RUN if [ -n "${MIRROR_URL}" ]; then spack mirror rm build_s3; fi
