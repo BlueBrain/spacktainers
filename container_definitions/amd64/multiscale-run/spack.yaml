@@ -1,14 +1,14 @@
+---
 spack:
-  specs:
-    - py-multiscale-run
+  specs: [py-multiscale-run]
   packages:
     petsc:
       require:
-        - "~hypre~superlu"  # Hypre fails to compile, SuperLU the same
+        - ~hypre~superlu-dist  # Hypre fails to compile, SuperLU the same
     py-pandas:
-      require: "~performance"  # Otherwise pulls in numba that requires outdated LLVM
+      require: ~performance  # Otherwise pulls in numba that requires outdated LLVM
     py-numpy-quaternion:
-      require: "~numba~scipy"  # See above, get around Numba
+      require: ~numba~scipy  # See above, get around Numba
     all:
       providers:
         mpi: [mpich]
