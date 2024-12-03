@@ -4,7 +4,7 @@ spack:
   packages:
     petsc:
       require:
-        - "~hypre"  # Hypre fails to compile
+        - "~hypre~superlu"  # Hypre fails to compile, SuperLU the same
     py-pandas:
       require: "~performance"  # Otherwise pulls in numba that requires outdated LLVM
     py-numpy-quaternion:
