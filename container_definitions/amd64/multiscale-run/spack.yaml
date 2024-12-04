@@ -5,6 +5,7 @@ spack:
     petsc:
       require:
         - ~hypre~superlu-dist  # Hypre fails to compile, SuperLU the same
+        - "@3.20"  # 3.22 seems to not be OK with our blas
     py-pandas:
       require: ~performance  # Otherwise pulls in numba that requires outdated LLVM
     py-numpy-quaternion:
