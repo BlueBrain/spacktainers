@@ -16,6 +16,7 @@ jobs:
           AWS_ECR_PATH: /spacktainers/builder
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ECR_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_ECR_SECRET_ACCESS_KEY }}
+          GHCR_PATH: /BlueBrain/spack-builder
           BUILD_PATH: builder
           BUILDAH_EXTRA_ARGS: --label org.opencontainers.image.revision="$GITHUB_SHA"
             --label org.opencontainers.image.authors="$GITHUB_TRIGGERING_ACTOR" --label
@@ -43,6 +44,7 @@ jobs:
           AWS_ECR_PATH: /spacktainers/runtime
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ECR_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_ECR_SECRET_ACCESS_KEY }}
+          GHCR_PATH: /BlueBrain/spack-runtime
           BUILD_PATH: runtime
           BUILDAH_EXTRA_ARGS: --label org.opencontainers.image.revision="$GITHUB_SHA"
             --label org.opencontainers.image.authors="$GITHUB_TRIGGERING_ACTOR" --label
@@ -95,6 +97,7 @@ jobs:
           AWS_ECR_PATH: /spacktainers/${{ matrix.spacktainer }}
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ECR_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_ECR_SECRET_ACCESS_KEY }}
+          GHCR_PATH: /BlueBrain/spack-${{ matrix.spacktainer }}
           BUILD_PATH: container_definitions/amd64/${{ matrix.spacktainer }}
           BUILDAH_EXTRA_ARGS: --label org.opencontainers.image.revision="$GITHUB_SHA"
             --label org.opencontainers.image.authors="$GITHUB_TRIGGERING_ACTOR" --label
