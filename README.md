@@ -60,7 +60,7 @@ spack:
 
 ## Repository layout
 
-Apart from that, folders of note are:
+Folders of note are:
 
 * builder: base container that contains our spack fork, needed to build the software that will be in the spacktainer
 * container_definitions: this is where users will define their containers
