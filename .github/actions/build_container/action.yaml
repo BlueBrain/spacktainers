@@ -27,6 +27,9 @@ inputs:
   GHCR_TOKEN:
     description: Token for GHCR authentication
     required: true
+  GHCR_PATH:
+    description: Path for the GitHub container registry
+    required: true
   SPACK_DEPLOYMENT_KEY_PUB:
     description: Public key for spack deployments
     required: true

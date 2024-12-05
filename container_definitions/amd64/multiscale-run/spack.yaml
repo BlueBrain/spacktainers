@@ -1,6 +1,20 @@
----
 spack:
-  specs: [py-multiscale-run]
+  specs:
+    - "gmsh@4:"
+    - "py-astrovascpy@0.1.5:"
+    - "py-bluepysnap@2:"
+    - "py-libsonata@0.1.20:"
+    - "py-mpi4py@3:"
+    - "py-notebook@6:"
+    - "py-numpy@1.22:"
+    - "py-pandas@1.4:"
+    - "py-psutil@5.8:"
+    - "py-pyyaml@5:"
+    - "py-scipy@1.11.1:"
+    - "py-simpleeval@0.9.13:"
+    - "py-tqdm@4.65:"
+    - "py-trimesh@3:"
+    - "steps@5"
   packages:
     petsc:
       require:

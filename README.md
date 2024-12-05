@@ -15,29 +15,6 @@ The only files you should have to edit as an end-user are located in the `contai
 
 In both cases, the filename will be used as the name of your container. In case of a YAML file, the container version will be derived from the first package in your spec. In case of a def file, the version will be the same as the tag on docker hub.
 
-## Adding extra files to your containers
-
-Create a folder under `spacktainer/files` to hold your container's files. Make sure to use your container's name to keep everything somewhat orderly.
-In your container definition file, add a `spacktainer` section with a `files` key. This key holds a list of `source:target` filepairs (note that there is no space between source and target!)
-Source is specified starting from the level below `spacktainer`; in the example below the folder structure would look like this:
-```
-spacktainer/files
-└── my-awesome-container
-    ├── some_folder
-    │   ├── brilliant_hack.patch
-    │   ├── readme.txt
-    │   ├── ugly_hack.patch
-    │   └── useless_but_if_we_delete_it_everything_breaks.jpg
-    └── script.sh
-
-```
-
-```
-spack:
-  specs:
-    - my-awesome-package
-```
-
 # Developer documentation
 
 ## Build Order
@@ -65,26 +42,6 @@ Folders of note are:
 * builder: base container that contains our spack fork, needed to build the software that will be in the spacktainer
 * container_definitions: this is where users will define their containers
 * runtime: base container that contains everything needed to run the spack-built environment
-
-## job_creator
-
-The main entrypoints can be found, unsurprisingly, in the `__main__.py` file. This is where the `click` commands are defined.
-
-`architectures.py` contains the configuration for different architectures: what bucket should be used for the Spack package cache, which tag should be applied for the gitlab jobs, in which variables is the authentication defined, etc
-
-`ci_objects.py` contains helper object that can be used to define gitlab jobs and workflows. These will take care of architecture-specific behaviour (such as setting/unsetting the proxy, setting AWS variables, ...)
-
-`containers.py` holds everything related to generating container jobs: classes that define the base containers (former Spacktainerizer, Singularitah) as well as the spacktainers (formerly Spackah) and custom containers. It also contains the methods that use these classes and return a workflow with only the required jobs.
-
-`job_templates.py` holds job definition templates as python dictionaries.
-
-`logging_config.py` should be self-explanatory
-
-`packages.py` holds everything related to package-building jobs. Here you'll find the methods that generate the workflows for building the job that runs `spack ci generate` as well as the job that processes the output.
-
-`spack_template.py` contains the spack.yaml template that will be merged with the user's container config to generate the spack.yaml that will be used to build the container
-
-`utils.py` contains utility functions for reading/writing yaml, getting the multiarch job for a container, ...
 
 ## Pulling images with Apptainer, Podman, or Sarus
 
