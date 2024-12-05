@@ -9,8 +9,8 @@ This repository aims to be the one-stop shop for all of our container needs.
 
 ## Defining containers
 
-The only files you should have to edit as an end-user are located in the `container_definitions` folder. There's a subfolder per architecture (currently supported: `amd64` and `arm64`) under which both `yaml` (in subdirectories) and `def` files can live.
-* A YAML file file defines a Spack container - in it you can define the Spack specs as you would in a Spack environment. If you have specific requirements for dependencies, you can add `spack: packages: ...` keys to define those, again, as in a Spack environment.
+The only files you should have to edit as an end-user are located in the `container_definitions` folder. There's a subfolder per architecture (currently supported: `amd64` and `arm64`) under which both `spack.yaml` (in subdirectories) and `def` files can live.
+* A `spack.yaml` file file defines a Spack container - in it you can define the Spack specs as you would in a Spack environment. If you have specific requirements for dependencies, you can add `spack: packages: ...` keys to define those, again, as in a Spack environment.
 * A def file defines a singularity container that will be built from an existing container on docker-hub. nexus-storage is already defined for amd64 as an example.
 
 In both cases, the filename will be used as the name of your container. In case of a YAML file, the container version will be derived from the first package in your spec. In case of a def file, the version will be the same as the tag on docker hub.
@@ -20,7 +20,6 @@ In both cases, the filename will be used as the name of your container. In case 
 Create a folder under `spacktainer/files` to hold your container's files. Make sure to use your container's name to keep everything somewhat orderly.
 In your container definition file, add a `spacktainer` section with a `files` key. This key holds a list of `source:target` filepairs (note that there is no space between source and target!)
 Source is specified starting from the level below `spacktainer`; in the example below the folder structure would look like this:
-
 ```
 spacktainer/files
 └── my-awesome-container
@@ -37,10 +36,6 @@ spacktainer/files
 spack:
   specs:
     - my-awesome-package
-spacktainer:
-  files:
-    - files/my-awesome-container/script.sh:/opt/script.sh
-    - files/my-awesome-container/some_folder:/opt/some_folder
 ```
 
 # Developer documentation
@@ -58,27 +53,18 @@ spacktainer:
 
 * `AWS_CACHE_ACCESS_KEY_ID` / `AWS_CACHE_SECRET_ACCESS_KEY`: AWS keypair for accessing the cache bucket hosted by Amazon
 * `AWS_INFRASTRUCTURE_ACCESS_KEY_ID` / `AWS_INFRASTRUCTURE_SECRET_ACCESS_KEY`: AWS keypair for accessing the containers bucket hosted by Amazon (bbpinfrastructureassets)
-* `BBP_CACHE_ACCESS_KEY_ID` / `BBP_CACHE_SECRET_ACCESS_KEY`: AWS keypair for accessing the cache bucket hosted by BBP
 * `SPACK_DEPLOYMENT_KEY_PRIVATE`: the Spack private deployment key (as a file!)
 * `SPACK_DEPLOYMENT_KEY_PUBLIC`: the Spack public deployment key (as a file!)
-* `DOCKERHUB_USER` / `DOCKERHUB_PASSWORD`: credentials for docker hub
+* `GHCR_USER` / `GHCR_TOKEN`: the user and associated access token to write to the GitHub Container Registry (GHCR)
 * `GITLAB_API_TOKEN`: private (!) gitlab token with API_READ access (CI_JOB_TOKEN does not have enough permissions). Change this once I'm gone
 
 ## Repository layout
-
-There are a few python projects in this repository:
-
-* get_artifacts: download artifacts from a pipeline. It's fairly specific to this repository.
-* job_creator: the main project; this will take care of generating the jobs in this project. Both of the other ones are called at some point in the pipelines it generates. It is further detailed below.
-* spackitor: the spack janitor that will clean the build cache. It has its own readme and comes with some useful scripts for manual actions.
 
 Apart from that, folders of note are:
 
 * builder: base container that contains our spack fork, needed to build the software that will be in the spacktainer
 * container_definitions: this is where users will define their containers
 * runtime: base container that contains everything needed to run the spack-built environment
-* singularitah: base container that contains singularity and s3cmd
-* spacktainer: contains the Dockerfile that will be used to build the spacky containers
 
 ## job_creator
 
@@ -100,7 +86,7 @@ The main entrypoints can be found, unsurprisingly, in the `__main__.py` file. Th
 
 `utils.py` contains utility functions for reading/writing yaml, getting the multiarch job for a container, ...
 
-## Pulling images with Sarus or Podman
+## Pulling images with Apptainer, Podman, or Sarus
 
 Make sure you have your AWS credentials set up.  Then identify the image you want to run.
 In the following, `spacktainers/neurodamus-neocortex` is going to be used.  Identify the
@@ -135,6 +121,16 @@ Get a login token from AWS:
 [secret]
 ```
 
+### Pulling with Apptainer (or Singularity)
+
+Pull from the registry, logging in at the same time with the `AWS` username and token from
+above:
+```
+❯ apptainer pull --docker-login docker://130659266700.dkr.ecr.us-east-1.amazonaws.com/spacktainers/neurodamus-neocortex
+```
+The resulting `neurodamus-neocortex.sif` file is the container and can be copied to a
+better storage location as desired.
+
 ### Pulling with Podman
 
 Log into the registry, using `AWS` as the username:
@@ -155,11 +151,54 @@ Everything in Sarus goes into one command:
 
 ## Reproducing GitHub Action builds containerized
 
+First the `builder` and `runtime` containers need to be built locally, with corresponding tags:
+```
+❯ podman build --format=docker builder -t local_builder
+❯ podman build --format=docker runtime -t local_runtime
+```
+
+Then create a new directory and add a `Dockerfile` inside, with the following contents:
+```
+FROM local_builder AS builder
+FROM local_runtime AS runtime
+
+COPY --from=builder /etc/debian_version /etc/debian_version
+```
+The last line is sometimes required to avoid optimizations that would skip including the
+`builder` container.
+
+Use a local Spack installation to create a GPG keypair to sign built packages, i.e:
+```
+❯ spack gpg create --export-secret key --export key.pub "Le Loup" "le.loup@epfl.ch"
+```
+
+And create a `spack.yaml`, i.e.:
+```
+spack:
+  specs:
+    - zlib
+  packages:
+    all:
+      providers:
+        mpi: [mpich]
+```
+The provider setting to prefer `mpich` may be helpful to execute the containers later with
+a runtime and SLURM using `srun --mpi=pmi2 ...`, which will facilitate better MPI
+communications.
+
+Then build the Docker file:
+```
+❯ podman build --format=docker .
+```
+
+### Using the official builder
+
 See above instructions under [pulling containers](#user-content-pulling-with-podman) to
 login and pull the `spacktainers/builder` container.
 Then launch the container and install something, i.e., with:
 ```
-❯ podman run -it 130659266700.dkr.ecr.us-east-1.amazonaws.com/spacktainers/builder
+❯ podman pull ghcr.io/bluebrain/spack-builder:latest
+❯ podman run -it ghcr.io/bluebrain/spack-builder:latest
 root@43dec0527c62:/# (cd /opt/spack-repos/ && git pull)
 Already up to date.
 root@43dec0527c62:/# spack install zlib
@@ -168,10 +207,21 @@ root@43dec0527c62:/# spack install zlib
 Environments may be recreated as present under
 [`container_definitions/`][(./container_definitions).
 
-## Reproducing GitHub Action builds locally
+You may use a `Dockerfile` as constructed above, but replace the local tags with the
+GitHub container registry ones to build a `spack.yaml`, too:
+```
+FROM ghcr.io/bluebrain/spack-builder AS builder
+FROM ghcr.io/bluebrain/spack-runtime AS runtime
+
+COPY --from=builder /etc/debian_version /etc/debian_version
+```
+This will still require a local GPG key pair to sign packages!
+
+## Reproducing GitHub Action builds locally (outside a container)
 
 Prerequisites needed to try the container building locally:
 
+0. A installation using Ubuntu 24.04 LTS, with compilers set up
 1. The upstream Spack commit we are using in the
    [`builder/Dockerfile`](builder/Dockerfile), in the argument `SPACK_BRANCH` (may be
    overwritten by the CI).  Referred to as `${SPACK_BRANCH}` here.

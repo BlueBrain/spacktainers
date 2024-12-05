@@ -28,8 +28,6 @@ jobs:
             --label ch.epfl.bbpgitlab.ci-commit-branch="$GITHUB_REF_NAME" --build-arg
             SPACK_BRANCH=develop
          # ' --label org.opencontainers.image.created="$CI_JOB_STARTED_AT"'
-          DOCKERHUB_USER: ${{ secrets.DOCKERHUB_USER }}
-          DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
           SPACK_DEPLOYMENT_KEY_PUB: ${{ secrets.SPACK_DEPLOYMENT_KEY_PUB }}
           SPACK_DEPLOYMENT_KEY_PRIVATE: ${{ secrets.SPACK_DEPLOYMENT_KEY_PRIVATE }}
   runtime-container-job:
@@ -58,8 +56,6 @@ jobs:
             --label ch.epfl.bbpgitlab.ci-commit-branch="$GITHUB_REF_NAME" --build-arg
             SPACK_BRANCH=develop
          # ' --label org.opencontainers.image.created="$CI_JOB_STARTED_AT"'
-          DOCKERHUB_USER: ${{ secrets.DOCKERHUB_USER }}
-          DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
           SPACK_DEPLOYMENT_KEY_PUB: ${{ secrets.SPACK_DEPLOYMENT_KEY_PUB }}
           SPACK_DEPLOYMENT_KEY_PRIVATE: ${{ secrets.SPACK_DEPLOYMENT_KEY_PRIVATE }}
   spacktainer-build-job:
@@ -115,7 +111,5 @@ jobs:
             --build-arg MIRROR_AUTH_ARG="\"--s3-access-key-id='${{ secrets.AWS_CACHE_ACCESS_KEY_ID }}
             --s3-access-key-secret=${{ secrets.AWS_CACHE_SECRET_ACCESS_KEY }}'\""
           # ' --label org.opencontainers.image.created="$CI_JOB_STARTED_AT"'
-          DOCKERHUB_USER: ${{ secrets.DOCKERHUB_USER }}
-          DOCKERHUB_PASSWORD: ${{ secrets.DOCKERHUB_PASSWORD }}
           SPACK_DEPLOYMENT_KEY_PUB: ${{ secrets.SPACK_DEPLOYMENT_KEY_PUB }}
           SPACK_DEPLOYMENT_KEY_PRIVATE: ${{ secrets.SPACK_DEPLOYMENT_KEY_PRIVATE }}
