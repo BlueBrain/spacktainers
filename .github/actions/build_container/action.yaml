@@ -21,11 +21,20 @@ inputs:
     description: Extra args to pass to buildah
     required: false
     default: ''
+  DOCKERHUB_USER:
+    description: Username for Dockerhub authentication
+    required: true
+  DOCKERHUB_PASSWORD:
+    description: Password for Dockerhub authentication
+    required: true
   GHCR_USER:
     description: Username for GHCR authentication
     required: true
   GHCR_TOKEN:
     description: Token for GHCR authentication
+    required: true
+  GHCR_PATH:
+    description: Path for the GitHub container registry
     required: true
   SPACK_DEPLOYMENT_KEY_PUB:
     description: Public key for spack deployments
@@ -49,6 +58,7 @@ runs:
         echo "${{ inputs.SPACK_DEPLOYMENT_KEY_PUB }}" > ${{ inputs.BUILD_PATH }}/key.pub
         echo "${{ inputs.SPACK_DEPLOYMENT_KEY_PRIVATE }}" > ${{ inputs.BUILD_PATH }}/key
         aws ecr get-login-password --region us-east-1 | buildah login --username AWS --password-stdin ${{ inputs.AWS_ECR_URL }}
+        buildah login --username ${{ inputs.DOCKERHUB_USER }} --password ${{ inputs.DOCKERHUB_PASSWORD }} docker.io
         buildah login --username ${{ inputs.GHCR_USER }} --password ${{ inputs.GHCR_TOKEN }} ghcr.io
         # This is written like that in case $BUILDAH_EXTRA_ARGS has args that require spaces,
         # which is tricky with shell variable expansion.  Similar to Kaniko, see also:

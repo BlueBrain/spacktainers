@@ -1,7 +1,7 @@
 spack:
   specs:
     - neurodamus-models model=neocortex ~plasticity+coreneuron+caliper
-    - py-neurodamus@git.73f26480a3181c7653fd4123a06119c60753f8e9
+    - py-neurodamus
   packages:
     all:
       providers:
