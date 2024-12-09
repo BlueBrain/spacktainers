@@ -16,6 +16,9 @@ spack:
     - "py-trimesh@3:"
     - "steps@5"
   packages:
+    gmsh:
+      require:
+        - ~fltk  # Adds more load to compile
     petsc:
       require:
         - ~hypre~superlu-dist  # Hypre fails to compile, SuperLU the same
