@@ -1,6 +1,6 @@
 spack:
   specs:
-    - neurodamus-models model=thalamus ~plasticity+coreneuron+caliper
+    - neurodamus-models model=thalamus +coreneuron+caliper
     - py-neurodamus
   packages:
     all:

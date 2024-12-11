@@ -11,6 +11,9 @@ This repository aims to be the one-stop shop for all of our container needs.
 
 The only files you should have to edit as an end-user are located in the `container_definitions` folder. There's a subfolder per architecture (currently supported: `amd64` and `arm64`) under which both `spack.yaml` (in subdirectories) and `def` files can live.
 * A `spack.yaml` file file defines a Spack container - in it you can define the Spack specs as you would in a Spack environment. If you have specific requirements for dependencies, you can add `spack: packages: ...` keys to define those, again, as in a Spack environment.
+* If a `Dockerfile.epilogue` is present in the container directory, it will be appended to
+the auto-generated `Dockerfile`. This can be used to, e.g., include compilers in the final
+container and perform other fine-tuning.
 * A def file defines a singularity container that will be built from an existing container on docker-hub. nexus-storage is already defined for amd64 as an example.
 
 In both cases, the filename will be used as the name of your container. In case of a YAML file, the container version will be derived from the first package in your spec. In case of a def file, the version will be the same as the tag on docker hub.
