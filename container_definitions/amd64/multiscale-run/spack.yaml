@@ -14,7 +14,7 @@ spack:
     - "py-simpleeval@0.9.13:"
     - "py-tqdm@4.65:"
     - "py-trimesh@3:"
-    - "steps@5"
+    # - "steps@5"  - fails to compile with modern GCC 🤷
   packages:
     gmsh:
       require:
