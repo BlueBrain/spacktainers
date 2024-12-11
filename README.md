@@ -174,6 +174,24 @@ COPY --from=builder /etc/debian_version /etc/debian_version
 ```
 This will still require a local GPG key pair to sign packages!
 
+## Converting images to Singularity SIF locally
+
+To convert images to Singularity locally, it seems simplest to first start a local
+Docker registry:
+```
+❯ podman container run -dt -p 5000:5000 --name registry docker.io/library/registry:2
+```
+
+Then build, tag, and upload a Dockerfile to the registry:
+```
+❯ podman build -v $PWD:/src . -t localhost:5000/td
+❯ podman push localhost:5000/td
+```
+The image from the registry can now be converted:
+```
+❯ SINGULARITY_NOHTTPS=1 singularity pull docker://localhost:5000/td:latest
+```
+
 ## Reproducing GitHub Action builds locally (outside a container)
 
 Prerequisites needed to try the container building locally:
