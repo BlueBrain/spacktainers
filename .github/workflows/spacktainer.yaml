@@ -74,6 +74,7 @@ jobs:
           # - multiscale-run
           - neurodamus-hippocampus
           - neurodamus-neocortex
+          - neurodamus-thalamus
           - system-benchmarks
     runs-on:
       - codebuild-spacktainers-tf-${{ github.run_id }}-${{ github.run_attempt }}
@@ -94,6 +95,9 @@ jobs:
           # Triggers building the 'builder' image, otherwise it is optimized away
           COPY --from=builder /etc/debian_version /etc/debian_version
           EOF
+          if [[ -f Dockerfile.epilogue ]]; then
+          cat Dockerfile.epilogue >> Dockerfile
+          fi
       - name: build ${{ matrix.spacktainer }}
         uses: ./.github/actions/build_container
         with:
