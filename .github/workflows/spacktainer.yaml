@@ -68,10 +68,10 @@ jobs:
         spacktainer:
           - appositionizer
           - brain-indexer
-          - brayns
+          # - brayns
           - connectome-manipulator
           - functionalizer
-          - multiscale-run
+          # - multiscale-run
           - neurodamus-hippocampus
           - neurodamus-neocortex
           - system-benchmarks
