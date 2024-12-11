@@ -113,6 +113,78 @@ Everything in Sarus goes into one command:
 ❯ sarus pull --login -u AWS 130659266700.dkr.ecr.us-east-1.amazonaws.com/spacktainers/neurodamus-neocortex
 ```
 
+## Running the containers
+
+**To have the best results possible, it is imperative that when running on clusters,
+`srun` is called with `srun --mpi=pmi2` to have the MPI in the container interface
+properly with the MPI on the cluster.**
+
+With all container runtime engines, directories that contain the data to be processed and
+output directories have to be mounted inside the container.
+The following two examples show how to do this on either CSCS or SCITAS.
+
+Also note that the Python paths given in these examples may vary between containers.  It
+is best to first run a container interactively and make sure that `init.py` is properly
+located.
+
+### Running with Sarus
+
+The following is a submission file that shows how to run Neurodamus on Eiger at CSCS.
+Note the invocation of Sarus with `sarus run --mpi` _as well as_ `srun --mpi=pmi2`.  This
+also shows how to mount data directories:
+```
+#!/bin/bash
+#SBATCH --account=g156
+#SBATCH --partition=normal
+#SBATCH --nodes=16
+#SBATCH --tasks-per-node=128
+#SBATCH --exclusive
+##SBATCH --mem=0
+#SBATCH --constraint=mc
+#SBATCH --time=04:00:00
+
+WORKDIR=/project/g156/magkanar/ticket
+DATADIR=/project/g156/NSETM-1948-extract-hex-O1/O1_data_physiology/
+IMAGE=130659266700.dkr.ecr.us-east-1.amazonaws.com/spacktainers/neurodamus-neocortex
+
+srun --mpi=pmi2 \
+	sarus run --mpi \
+			--env=HDF5_USE_FILE_LOCKING=FALSE \
+			--workdir=${PWD} \
+			--mount=type=bind,source=${DATADIR},destination=${DATADIR} \
+			--mount=type=bind,source=${PWD},destination=${PWD} \
+		${IMAGE} \
+		special -mpi -python /opt/view/lib/python3.13/site-packages/neurodamus/data/init.py --configFile=${PWD}/simulation_config_O1_full.json --enable-shm=OFF --coreneuron-direct-mode
+```
+
+### Running with Apptainer
+
+The following is a submission file that shows how to run Neurodamus on Jed from SCITAS.
+Note that the `/work` directory with data was mounted with `-B /work/lnmc`:
+```
+#!/bin/zsh
+#
+#SBATCH --nodes 2
+#SBATCH --qos parallel
+#SBATCH --tasks-per-node 72
+#SBATCH --time 2:00:0
+
+CONFIG=/work/lnmc/barrel_cortex/mouse-simulations/simulation_config.json
+OUTPUT=/work/lnmc/matthias_test_delete_me_please/apptainah
+
+srun --mpi=pmi2 \
+	apptainer run -B /work/lnmc/ -B ${HOME} /work/lnmc/software/containers/spack-neurodamus-neocortex_latest.sif \
+		special \
+		-mpi \
+		-python \
+		/opt/view/lib/python3.13/site-packages/neurodamus/data/init.py \
+		--configFile=${HOME}/simulation_config.json \
+		--enable-shm=OFF \
+		--coreneuron-direct-mode \
+		--output-path=${OUTPUT} \
+		--lb-mode=WholeCell
+```
+
 ## Reproducing GitHub Action builds containerized
 
 First the `builder` and `runtime` containers need to be built locally, with corresponding tags:
