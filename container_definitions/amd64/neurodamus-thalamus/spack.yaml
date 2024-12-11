@@ -1,0 +1,8 @@
+spack:
+  specs:
+    - neurodamus-models model=thalamus ~plasticity+coreneuron+caliper
+    - py-neurodamus
+  packages:
+    all:
+      providers:
+        mpi: [mpich]
