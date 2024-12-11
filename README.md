@@ -78,6 +78,10 @@ Get a login token from AWS:
 [secret]
 ```
 
+**Note that all images are also available from the GitHub Container Registry (GHCR), i.e.,
+via `apptainer pull docker://ghcr.io/bluebrain/spack-neurodamus-neocortex`. The URL has to
+be all lowercase, and the download will work without login.**
+
 ### Pulling with Apptainer (or Singularity)
 
 Pull from the registry, logging in at the same time with the `AWS` username and token from
@@ -87,6 +91,9 @@ above:
 ```
 The resulting `neurodamus-neocortex.sif` file is the container and can be copied to a
 better storage location as desired.
+
+NB: `apptainer` and `singularity` may, in almost all circumstances, be treated
+interchangeably.
 
 ### Pulling with Podman
 
@@ -174,7 +181,7 @@ COPY --from=builder /etc/debian_version /etc/debian_version
 ```
 This will still require a local GPG key pair to sign packages!
 
-## Converting images to Singularity SIF locally
+### Converting images to Singularity SIF locally
 
 To convert images to Singularity locally, it seems simplest to first start a local
 Docker registry:
