@@ -139,11 +139,11 @@ ONBUILD RUN spack env activate /opt/spack-environment; \
 
 ONBUILD RUN if [ -n "${MIRROR_URL}" ]; then spack mirror rm build_s3; fi
 # Strip all the binaries
-ONBUILD RUN find -L /opt/view/* -type f -exec readlink -f '{}' \; | \
-    xargs file -i | \
-    grep 'charset=binary' | \
-    grep 'x-executable\|x-archive\|x-sharedlib' | \
-    awk -F: '{print $1}' | xargs strip -s
+# ONBUILD RUN find -L /opt/view/* -type f -exec readlink -f '{}' \; | \
+#     xargs file -i | \
+#     grep 'charset=binary' | \
+#     grep 'x-executable\|x-archive\|x-sharedlib' | \
+#     awk -F: '{print $1}' | xargs strip -s
 
 # Modifications to the environment that are necessary to run
 ONBUILD RUN cd /opt/spack-environment && \
